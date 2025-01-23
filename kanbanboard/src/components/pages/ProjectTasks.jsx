@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axiosInstance from "../../utils/axiosInstance";
 import { useParams, useNavigate } from "react-router-dom";
-import { FaMoon, FaSun } from "react-icons/fa";
+import { FaMoon, FaSun, FaUser } from "react-icons/fa";
 import AnalyticsModal from "./AnalyticsModel";
 import AddTaskModal from "./AddTaskModal";
 import EditTaskModal from "./EditTaskModal"; // Import the EditTaskModal component
@@ -29,6 +29,9 @@ const ProjectTasks = () => {
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [priorityFilter, setPriorityFilter] = useState("");
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [username, setUsername] = useState("");
+
   const navigate = useNavigate();
 
   if (!localStorage.getItem("authToken")) {
@@ -45,6 +48,24 @@ const ProjectTasks = () => {
   useEffect(() => {
     fetchTasks();
   }, [projectId]);
+
+  useEffect(() => {
+    fetchUsername();
+  }, []);
+
+  const fetchUsername = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      const { data } = await axiosInstance.get("/auth/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setUsername(data.username);
+    } catch (error) {
+      console.error("Error fetching username:", error.message);
+    }
+  };
 
   const fetchTasks = async () => {
     console.log("fetching tasks");
@@ -335,6 +356,10 @@ const ProjectTasks = () => {
     return new Date(dueDate) < new Date();
   };
 
+  const toggleUserDropdown = () => {
+    setIsUserDropdownOpen(!isUserDropdownOpen);
+  };
+
   return (
     <div
       className={`min-h-screen ${
@@ -349,13 +374,6 @@ const ProjectTasks = () => {
       >
         <h1 className="text-xl font-bold">Admin Dashboard</h1>
         <div className="flex space-x-4">
-          {/* Dark Mode Toggle */}
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full shadow hover:bg-gray-200"
-          >
-            {darkMode ? <FaSun /> : <FaMoon />}
-          </button>
           <input
             type="text"
             placeholder="Search tasks..."
@@ -381,18 +399,41 @@ const ProjectTasks = () => {
             <option value="medium">Medium</option>
             <option value="high">High</option>
           </select>
+
           <button
             onClick={() => setShowAddTaskModal(true)}
             className="bg-white text-blue-600 px-4 py-2 rounded-lg shadow hover:bg-gray-200 transition"
           >
             Add Task
           </button>
+          {/* Dark Mode Toggle */}
           <button
-            onClick={handleLogout}
-            className="bg-white text-blue-600 px-4 py-2 rounded-lg shadow hover:bg-gray-200 transition"
+            onClick={() => setDarkMode(!darkMode)}
+            className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full shadow hover:bg-gray-200"
           >
-            Logout
+            {darkMode ? <FaSun /> : <FaMoon />}
           </button>
+          <div className="relative">
+            <button
+              className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full shadow hover:bg-gray-200"
+              onClick={toggleUserDropdown}
+            >
+              <FaUser />
+            </button>
+            {isUserDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-10">
+                <p className="px-4 py-2 text-gray-700">
+                  Logged in as: {username}
+                </p>
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </nav>
 

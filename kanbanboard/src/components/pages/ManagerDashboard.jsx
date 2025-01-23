@@ -12,6 +12,8 @@ const ManagerDashboard = () => {
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [dependencyOptions, setDependencyOptions] = useState([]);
   const [darkMode, setDarkMode] = useState(true);
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [username, setUsername] = useState("");
   const [columns, setColumns] = useState({
     todo: {
       name: "To Do",
@@ -319,6 +321,24 @@ const ManagerDashboard = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
+  useEffect(() => {
+    fetchUsername();
+  }, []);
+
+  const fetchUsername = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      const { data } = await axiosInstance.get("/auth/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setUsername(data.username);
+    } catch (error) {
+      console.error("Error fetching username:", error.message);
+    }
+  };
+
   const [managerProject, setManagerProject] = useState(false);
   useEffect(() => {
     const checkManagerProject = async () => {
@@ -342,6 +362,10 @@ const ManagerDashboard = () => {
     checkManagerProject();
   }, []);
 
+  const toggleUserDropdown = () => {
+    setIsUserDropdownOpen(!isUserDropdownOpen);
+  };
+
   return (
     <div
       className={`min-h-screen ${
@@ -355,6 +379,9 @@ const ManagerDashboard = () => {
         toggleDropdown={toggleDropdown}
         isDropdownOpen={isDropdownOpen}
         searchQuery={searchQuery}
+        toggleUserDropdown={toggleUserDropdown}
+        isUserDropdownOpen={isUserDropdownOpen}
+        username={username}
         handleSearchChange={handleSearchChange}
         priorityFilter={priorityFilter}
         handlePriorityFilterChange={handlePriorityFilterChange}

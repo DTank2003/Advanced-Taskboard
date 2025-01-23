@@ -6,6 +6,6 @@ const {limiter} = require("../middlewares/rateLimiter");
 
 router.post('/register', limiter, registerUser);
 router.post('/login', limiter, loginUser);
-router.get('/me', getMe);
+router.get('/me', authMiddleware(["admin","manager","user"]),getMe);
 
 module.exports = router;

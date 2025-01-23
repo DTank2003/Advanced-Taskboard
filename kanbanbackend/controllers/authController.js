@@ -62,9 +62,15 @@ exports.loginUser = async (req, res) => {
 
 exports.getMe = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("-password");
+    if (!req.user) {
+      return res.status(401).json({ message: "No req.user" });
+    }
+    const userId = req.user.id;
+    console.log(userId);
+    const user = await User.findById(userId).select("-password");
+    console.log(user);
     res.status(200).json(user);
   } catch (error) {
-    console.log(error);
+    res.status(500).json({ message: error.message });
   }
 };

@@ -2,7 +2,14 @@ import { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import axiosInstance from "../../utils/axiosInstance";
 import { useNavigate } from "react-router-dom";
-import { FaComment, FaListAlt, FaBell, FaMoon, FaSun } from "react-icons/fa";
+import {
+  FaComment,
+  FaListAlt,
+  FaUser,
+  FaBell,
+  FaMoon,
+  FaSun,
+} from "react-icons/fa";
 import AddCommentModal from "./AddCommentModal";
 import ActivityLogModal from "./ActivityLogModal";
 import NotificationDropdown from "./NotificationDropdown";
@@ -30,6 +37,9 @@ const UserDashboard = () => {
   const [priorityFilter, setPriorityFilter] = useState("");
   const [showCommentsModal, setShowCommentsModal] = useState(false);
   const [darkMode, setDarkMode] = useState(true); // Dark mode state
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [username, setUsername] = useState("");
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -44,7 +54,22 @@ const UserDashboard = () => {
 
   useEffect(() => {
     fetchTasks();
+    fetchUsername();
   }, []);
+
+  const fetchUsername = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      const { data } = await axiosInstance.get("/auth/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setUsername(data.username);
+    } catch (error) {
+      console.error("Error fetching username:", error.message);
+    }
+  };
 
   const fetchTasks = async () => {
     // Fetch tasks logic
@@ -188,6 +213,15 @@ const UserDashboard = () => {
     return new Date(dueDate) < new Date();
   };
 
+  const toggleUserDropdown = () => {
+    setIsUserDropdownOpen(!isUserDropdownOpen);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    navigate("/");
+  };
+
   return (
     <div
       className={`min-h-screen ${
@@ -202,25 +236,6 @@ const UserDashboard = () => {
       >
         <h1 className="text-xl font-bold">User Dashboard</h1>
         <div className="flex space-x-4">
-          {/* Dark Mode Toggle */}
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full shadow hover:bg-gray-200"
-          >
-            {darkMode ? <FaSun /> : <FaMoon />}
-          </button>
-          {/* Notification Icon */}
-          <div className="relative">
-            <button
-              className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full shadow hover:bg-gray-200"
-              onClick={toggleDropdown}
-            >
-              <FaBell />
-            </button>
-            {isDropdownOpen && (
-              <NotificationDropdown onClose={toggleDropdown} />
-            )}
-          </div>
           <input
             type="text"
             placeholder="Search tasks..."
@@ -246,12 +261,47 @@ const UserDashboard = () => {
             <option value="medium">Medium</option>
             <option value="high">High</option>
           </select>
+          {/* Dark Mode Toggle */}
           <button
-            onClick={() => navigate("/")}
-            className="bg-white text-blue-600 px-4 py-2 rounded-lg shadow hover:bg-gray-200 transition"
+            onClick={() => setDarkMode(!darkMode)}
+            className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full shadow hover:bg-gray-200"
           >
-            Logout
+            {darkMode ? <FaSun /> : <FaMoon />}
           </button>
+          {/* Notification Icon */}
+          <div className="relative">
+            <button
+              className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full shadow hover:bg-gray-200"
+              onClick={toggleDropdown}
+            >
+              <FaBell />
+            </button>
+            {isDropdownOpen && (
+              <NotificationDropdown onClose={toggleDropdown} />
+            )}
+          </div>
+
+          <div className="relative">
+            <button
+              className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full shadow hover:bg-gray-200"
+              onClick={toggleUserDropdown}
+            >
+              <FaUser />
+            </button>
+            {isUserDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-10">
+                <p className="px-4 py-2 text-gray-700">
+                  Logged in as: {username}
+                </p>
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </nav>
 

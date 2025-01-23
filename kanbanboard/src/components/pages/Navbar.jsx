@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { FaBell, FaMoon, FaSun } from "react-icons/fa";
+import { FaBell, FaMoon, FaSun, FaUser } from "react-icons/fa";
 import NotificationDropdown from "./NotificationDropdown";
 
 const Navbar = ({
@@ -8,6 +8,9 @@ const Navbar = ({
   toggleDropdown,
   isDropdownOpen,
   searchQuery,
+  toggleUserDropdown,
+  isUserDropdownOpen,
+  username,
   handleSearchChange,
   priorityFilter,
   handlePriorityFilterChange,
@@ -22,23 +25,6 @@ const Navbar = ({
     >
       <h1 className="text-xl font-bold">Manager Dashboard</h1>
       <div className="flex space-x-4">
-        {/* Dark Mode Toggle */}
-        <button
-          onClick={() => setDarkMode(!darkMode)}
-          className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full shadow hover:bg-gray-200"
-        >
-          {darkMode ? <FaSun /> : <FaMoon />}
-        </button>
-        {/* Notification Icon */}
-        <div className="relative flex items-center">
-          <button
-            className="bg-gray-100 text-gray-700 p-2 rounded-full shadow hover:bg-gray-200"
-            onClick={toggleDropdown}
-          >
-            <FaBell />
-          </button>
-          {isDropdownOpen && <NotificationDropdown onClose={toggleDropdown} />}
-        </div>
         <input
           type="text"
           placeholder="Search tasks..."
@@ -70,12 +56,45 @@ const Navbar = ({
         >
           Add Task
         </button>
+
+        {/* Notification Icon */}
+        <div className="relative flex items-center">
+          <button
+            className="bg-gray-100 text-gray-700 p-2 rounded-full shadow hover:bg-gray-200"
+            onClick={toggleDropdown}
+          >
+            <FaBell />
+          </button>
+          {isDropdownOpen && <NotificationDropdown onClose={toggleDropdown} />}
+        </div>
+        {/* Dark Mode Toggle */}
         <button
-          onClick={handleLogout}
-          className="bg-white text-blue-600 px-4 py-2 rounded-lg shadow hover:bg-gray-200 transition"
+          onClick={() => setDarkMode(!darkMode)}
+          className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full shadow hover:bg-gray-200"
         >
-          Logout
+          {darkMode ? <FaSun /> : <FaMoon />}
         </button>
+        <div className="relative">
+          <button
+            className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full shadow hover:bg-gray-200"
+            onClick={toggleUserDropdown}
+          >
+            <FaUser />
+          </button>
+          {isUserDropdownOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-10">
+              <p className="px-4 py-2 text-gray-700">
+                Logged in as: {username}
+              </p>
+              <button
+                onClick={handleLogout}
+                className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+              >
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </nav>
   );
@@ -87,6 +106,9 @@ Navbar.propTypes = {
   toggleDropdown: PropTypes.func.isRequired,
   isDropdownOpen: PropTypes.bool.isRequired,
   searchQuery: PropTypes.string.isRequired,
+  toggleUserDropdown: PropTypes.func.isRequired,
+  isUserDropdownOpen: PropTypes.bool.isRequired,
+  username: PropTypes.string.isRequired,
   handleSearchChange: PropTypes.func.isRequired,
   priorityFilter: PropTypes.string.isRequired,
   handlePriorityFilterChange: PropTypes.func.isRequired,
