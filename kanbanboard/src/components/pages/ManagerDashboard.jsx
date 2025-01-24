@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import axiosInstance from "../../utils/axiosInstance";
 import { useNavigate } from "react-router-dom";
-import { FaMoon, FaSun, FaBell } from "react-icons/fa";
-import NotificationDropdown from "./NotificationDropdown";
 import AddTaskModal from "./AddTaskModal"; // Import the AddTaskModal component
 import EditTaskModal from "./EditTaskModal"; // Import the EditTaskModal component
 import TasksList from "./TasksList";
@@ -220,49 +218,39 @@ const ManagerDashboard = () => {
     if (
       source.droppableId === destination.droppableId &&
       source.index === destination.index
-    )
+    ) {
       return;
+    }
 
-    const taskToMove = columns[source.droppableId].items[source.index];
+    const taskToMove = columns[source.droppableId]?.items[source.index];
     if (
       destination.droppableId === "done" &&
-      taskToMove.dependencies &&
-      taskToMove.dependencies.length > 0
+      taskToMove?.dependencies?.length > 0
     ) {
-      const incompleteDependencies = taskToMove.dependencies.filter(
-        (depId) => !columns.done.items.some((task) => task._id === depId)
-      );
+      const incompleteDependencies =
+        taskToMove.dependencies.filter(
+          (depId) => !columns.done.items.some((task) => task._id === depId)
+        ) || [];
       if (incompleteDependencies.length > 0) {
         alert("Cannot move task to Done until all dependencies are completed!");
         return;
       }
     }
 
-    const sourceColumn = columns[source.droppableId];
-    const destColumn = columns[destination.droppableId];
-    const sourceItems = [...sourceColumn.items];
-    const destItems = [...destColumn.items];
-    const [removed] = sourceItems.splice(source.index, 1);
+    const updatedColumns = structuredClone(columns); // Deep copy to avoid mutation
+    const sourceItems = updatedColumns[source.droppableId].items;
+    const destItems = updatedColumns[destination.droppableId].items;
 
-    destItems.splice(destination.index, 0, removed);
+    const [removedTask] = sourceItems.splice(source.index, 1);
+    destItems.splice(destination.index, 0, removedTask);
 
-    setColumns({
-      ...columns,
-      [source.droppableId]: {
-        ...sourceColumn,
-        items: sourceItems,
-      },
-      [destination.droppableId]: {
-        ...destColumn,
-        items: destItems,
-      },
-    });
+    setColumns(updatedColumns);
 
     // Update task status on the backend
     const token = localStorage.getItem("authToken");
     axiosInstance
       .put(
-        `/tasks/${removed._id}`,
+        `/tasks/${removedTask._id}`,
         { status: destination.droppableId },
         {
           headers: {
