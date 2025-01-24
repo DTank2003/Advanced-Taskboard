@@ -46,7 +46,14 @@ const NotificationDropdown = ({ onClose }) => {
   return (
     <div
       ref={dropdownRef}
-      className="absolute right-0 mt-8 bg-white border border-gray-300 rounded shadow-lg w-80 z-10"
+      className="absolute left-0 mt-2 bg-white border border-gray-300 rounded shadow-lg w-80 z-10"
+      style={{
+        right: "auto",
+        left: "auto",
+        top: "100%",
+        transform: "translateX(-50%)",
+      }}
+      // Ensure the dropdown appears below the navbar
     >
       <div className="flex justify-between px-4 py-2 border-b bg-gray-100">
         <span className="font-medium text-gray-700">Notifications</span>

@@ -372,14 +372,14 @@ const ProjectTasks = () => {
           darkMode ? "bg-gray-800" : "bg-blue-600"
         }`}
       >
-        <h1 className="text-xl font-bold">Admin Dashboard</h1>
-        <div className="flex space-x-4">
+        <h1 className="text-2xl font-bold tracking-wide">Admin Dashboard</h1>
+        <div className="flex space-x-4 items-center">
           <input
             type="text"
             placeholder="Search tasks..."
             value={searchQuery}
             onChange={handleSearchChange}
-            className={`border rounded p-2 w-1/3 ${
+            className={`border rounded-lg p-2 w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
               darkMode
                 ? "bg-gray-700 text-white border-gray-600"
                 : "border-gray-300 text-black"
@@ -388,7 +388,7 @@ const ProjectTasks = () => {
           <select
             value={priorityFilter}
             onChange={handlePriorityFilterChange}
-            className={`border rounded p-2 ${
+            className={`border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
               darkMode
                 ? "bg-gray-700 text-white border-gray-600"
                 : "border-gray-300 text-black"
@@ -402,20 +402,20 @@ const ProjectTasks = () => {
 
           <button
             onClick={() => setShowAddTaskModal(true)}
-            className="bg-white text-blue-600 px-4 py-2 rounded-lg shadow hover:bg-gray-200 transition"
+            className="bg-white text-blue-600 px-4 py-2 rounded-lg shadow hover:bg-gray-200 transition duration-300 ease-in-out transform hover:scale-105"
           >
             Add Task
           </button>
           {/* Dark Mode Toggle */}
           <button
             onClick={() => setDarkMode(!darkMode)}
-            className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full shadow hover:bg-gray-200"
+            className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full shadow hover:bg-gray-200 transition duration-300 ease-in-out transform hover:scale-105"
           >
             {darkMode ? <FaSun /> : <FaMoon />}
           </button>
           <div className="relative">
             <button
-              className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full shadow hover:bg-gray-200"
+              className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full shadow hover:bg-gray-200 transition duration-300 ease-in-out transform hover:scale-105"
               onClick={toggleUserDropdown}
             >
               <FaUser />
@@ -423,7 +423,8 @@ const ProjectTasks = () => {
             {isUserDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-10">
                 <p className="px-4 py-2 text-gray-700">
-                  Logged in as: {username}
+                  Logged in as:{" "}
+                  <span className="font-semibold">{username}</span>
                 </p>
                 <button
                   onClick={handleLogout}

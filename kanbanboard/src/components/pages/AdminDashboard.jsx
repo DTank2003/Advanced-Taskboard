@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axiosInstance from "../../utils/axiosInstance";
 import AddProjectModal from "./AddProjectModal";
 import EditProjectModal from "./EditProjectModal";
 import { useNavigate } from "react-router-dom";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaTrash, FaSun, FaMoon } from "react-icons/fa";
 
 const AdminDashboard = () => {
   const [projects, setProjects] = useState([]);
@@ -164,7 +164,7 @@ const AdminDashboard = () => {
                 : "bg-white text-blue-600 hover:bg-gray-200"
             }`}
           >
-            {darkMode ? "Light Mode" : "Dark Mode"}
+            {darkMode ? <FaSun /> : <FaMoon />}
           </button>
         </div>
       </nav>
