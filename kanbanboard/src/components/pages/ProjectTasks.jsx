@@ -68,7 +68,7 @@ const ProjectTasks = () => {
   };
 
   const fetchTasks = async () => {
-    console.log("fetching tasks");
+    console.log("Fetching tasks...");
     try {
       const token = localStorage.getItem("authToken");
       const { data } = await axiosInstance.get(`/tasks/project/${projectId}`, {
@@ -76,28 +76,34 @@ const ProjectTasks = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+
+      // Update dependency options for tasks
       setDependencyOptions(data);
 
-      const todoTasks = data.filter((task) => task.status === "todo");
-      const inProgressTasks = data.filter(
-        (task) => task.status === "inprogress"
-      );
-      const doneTasks = data.filter((task) => task.status === "done");
-
-      setColumns({
+      // Group and sort tasks by their status and order
+      const groupedTasks = {
         todo: {
           name: "To Do",
-          items: todoTasks,
+          items: data
+            .filter((task) => task.status === "todo")
+            .sort((a, b) => a.order - b.order),
         },
         inprogress: {
           name: "In Progress",
-          items: inProgressTasks,
+          items: data
+            .filter((task) => task.status === "inprogress")
+            .sort((a, b) => a.order - b.order),
         },
         done: {
           name: "Done",
-          items: doneTasks,
+          items: data
+            .filter((task) => task.status === "done")
+            .sort((a, b) => a.order - b.order),
         },
-      });
+      };
+
+      // Update columns state with grouped and ordered tasks
+      setColumns(groupedTasks);
     } catch (error) {
       console.error("Error fetching tasks:", error.message);
     }
@@ -248,7 +254,7 @@ const ProjectTasks = () => {
     navigate("/");
   };
 
-  const onDragEnd = (result) => {
+  const onDragEnd = async (result) => {
     const { source, destination } = result;
 
     if (!destination) return;
@@ -261,6 +267,8 @@ const ProjectTasks = () => {
     }
 
     const taskToMove = columns[source.droppableId]?.items[source.index];
+
+    // Dependency validation for moving to "done" column
     if (
       destination.droppableId === "done" &&
       taskToMove?.dependencies?.length > 0
@@ -275,30 +283,52 @@ const ProjectTasks = () => {
       }
     }
 
-    const updatedColumns = structuredClone(columns); // Deep copy to avoid mutation
+    // Deep copy columns to avoid direct mutation
+    const updatedColumns = structuredClone(columns);
+
     const sourceItems = updatedColumns[source.droppableId].items;
     const destItems = updatedColumns[destination.droppableId].items;
 
+    // Remove task from source and add it to destination
     const [removedTask] = sourceItems.splice(source.index, 1);
     destItems.splice(destination.index, 0, removedTask);
 
+    // Recalculate the order for tasks in the destination column
+    const reorderedTasks = destItems.map((task, index) => ({
+      ...task,
+      order: index,
+    }));
+
+    // Update columns in the frontend
+    updatedColumns[destination.droppableId].items = reorderedTasks;
+    updatedColumns[source.droppableId].items = sourceItems;
     setColumns(updatedColumns);
 
-    // Update task status on the backend
-    const token = localStorage.getItem("authToken");
-    axiosInstance
-      .put(
-        `/tasks/${removedTask._id}`,
-        { status: destination.droppableId },
+    // Prepare data for the backend
+    const updatedTaskData = reorderedTasks.map((task) => ({
+      _id: task._id,
+      order: task.order,
+    }));
+
+    try {
+      const token = localStorage.getItem("authToken");
+      // Send updated order to the backend
+      await axiosInstance.put(
+        "/tasks/reorder",
+        {
+          updatedTask: removedTask,
+          tasks: updatedTaskData,
+          status: destination.droppableId, // Optionally include the status
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
-      )
-      .catch((error) => {
-        console.error("Error updating task status:", error.message);
-      });
+      );
+    } catch (error) {
+      console.error("Error updating task order on the backend:", error.message);
+    }
   };
 
   const getPriorityColor = (priority) => {

@@ -8,7 +8,7 @@ const { notifyTaskUpdate, notifyTaskManager } = require("../utils/notificationHe
 
 const getAllTasks = async (req, res) => {
   try {
-    const tasks = await Task.find()
+    const tasks = await Task.find().sort({status: 1, order: 1})
       .populate("dependencies")
       .populate("assignedTo");
     res.status(200).json(tasks);
@@ -67,19 +67,32 @@ const createTask = async (req, res) => {
       status,
       dependencies = [],
     } = req.body;
-    const newTask = new Task({
+    
+    // const tasks = await Task.find({status})
+    //   .sort({ order: -1 })
+    //   .limit(1);
+    // const maxOrder = tasks.length > 0 ? tasks[0].order : 0;
+
+    const maxOrder = await Task.findOne({ status, projectId }).sort({ order: -1 }).exec();
+    const newOrder = maxOrder ? maxOrder.order + 1: 1;
+    console.log(`max order is ${maxOrder}`);
+      console.log(`new order is ${newOrder}`);
+    
+      const newTask = new Task({
       title,
       description,
       priority,
       assignedTo,
       projectId,
       dueDate,
+      order: newOrder,
       status,
       dependencies: Array.isArray(dependencies) ? dependencies : JSON.parse(dependencies),
       attachment: req.file
         ? req.file.filename
         : null,
     });
+
 
     await newTask.save();
     const user = await User.findById({_id: req.user._id});
@@ -139,6 +152,47 @@ const getTaskByProjectId = async (req, res) => {
   }
 };
 
+const reorderTasks = async (req, res) => {
+  const {updatedTask, tasks, status} = req.body;
+  console.log("reorderTasks called");
+  try {
+    const bulkOps = tasks.map((task) => ({
+      updateOne: {
+        filter: { _id: task._id },
+        update: { order: task.order, status },
+      },
+    }));
+
+    await Task.bulkWrite(bulkOps);
+    try {
+      await activityLogModel.create({
+        taskId: updatedTask._id,
+        userId: req.user._id,
+        action: "Task reordered",
+      });
+      console.log("activitylog entry done heree");
+    } catch (error) {
+      console.log("error logging", error);
+    }
+
+    const role = req.user.role;
+    const user = await User.findById({_id: req.user._id});
+    if(role === "user") {
+      const projectId = updatedTask.projectId;
+      const project = await Project.find({_id: projectId});
+
+      await notifyTaskManager({managerId: project[0].assignedManager, task: updatedTask, message: `Task reordered by ${user.username}`});
+    }
+    else {
+      await notifyTaskUpdate(updatedTask, `Task updated by ${user.username}`);
+    }
+
+    res.status(200).json({message: 'Tasks reordered successfully'});
+  } catch(error) {
+    res.status(500).json({error: "Error reordering tasks"});
+  }
+}
+
 const updateTask = async (req, res) => {
   try {
     const updatedTask = await Task.findByIdAndUpdate(req.params.id, req.body, {
@@ -150,7 +204,7 @@ const updateTask = async (req, res) => {
         userId: req.user._id,
         action: "Task Updated",
       });
-      console.log("activitylog entry done");
+      console.log("activitylog entry done yaha");
     } catch (error) {
       console.log("error logging", error);
     }
@@ -238,6 +292,7 @@ module.exports = {
   deleteTask,
   addDependency,
   getTaskByProjectId,
+  reorderTasks,
   getTasksByManagerProject,
   getUserTasks,
   markTaskComplete,

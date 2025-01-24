@@ -13,6 +13,9 @@ const taskSchema = new mongoose.Schema({
         enum: ["low","medium","high"],
         default: "medium",
     },
+    order: {
+        type: Number,
+    },
     projectId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Project",
