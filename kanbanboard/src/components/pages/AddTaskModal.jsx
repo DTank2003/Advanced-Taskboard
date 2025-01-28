@@ -7,6 +7,7 @@ const AddTaskModal = ({
   setShowAddTaskModal,
   handleAddTask,
   users,
+  projectId,
   dependencyOptions,
   darkMode,
   handleFileChange,
@@ -18,8 +19,11 @@ const AddTaskModal = ({
   if (!showAddTaskModal) return null;
 
   const onSubmit = (data) => {
-    data.projectId = managerProject._id;
-    console.log(data);
+    if (managerProject) {
+      data.projectId = managerProject._id;
+    } else {
+      data.projectId = projectId;
+    }
     handleAddTask(data);
     reset();
     setShowAddTaskModal(false);
@@ -216,6 +220,7 @@ AddTaskModal.propTypes = {
   setShowAddTaskModal: PropTypes.func.isRequired,
   handleAddTask: PropTypes.func.isRequired,
   users: PropTypes.array.isRequired,
+  projectId: PropTypes.string,
   dependencyOptions: PropTypes.array.isRequired,
   darkMode: PropTypes.bool.isRequired,
   handleFileChange: PropTypes.func.isRequired,

@@ -69,6 +69,25 @@ export const editProject = createAsyncThunk(
     }
   );
 
+export const fetchTasksByProject = createAsyncThunk(
+  'projects/fetchTaskByProject',
+  async(projectId, {rejectWithValue}) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      const {data} = await axiosInstance.get(`tasks/project/${projectId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return data;
+    } catch(error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+)
+
   export const fetchManagerProject = createAsyncThunk(
     'projects/fetchManagerProject',
     async (_, { rejectWithValue }) => {
@@ -80,6 +99,23 @@ export const editProject = createAsyncThunk(
           },
         });
         return data[0]; // Assuming the manager has only one project
+      } catch (error) {
+        return rejectWithValue(error.response.data);
+      }
+    }
+  );
+
+  export const fetchProjectAnalytics = createAsyncThunk(
+    'projects/fetchProjectAnalytics',
+    async (projectId, { rejectWithValue }) => {
+      try {
+        const token = localStorage.getItem('authToken');
+        const { data } = await axiosInstance.get(`/projects/analytics/${projectId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        return data;
       } catch (error) {
         return rejectWithValue(error.response.data);
       }

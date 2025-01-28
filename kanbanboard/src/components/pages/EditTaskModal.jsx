@@ -9,6 +9,7 @@ const EditTaskModal = ({
   editTask,
   handleEditTask,
   users,
+  projectId,
   dependencyOptions,
   darkMode,
 }) => {
@@ -18,7 +19,11 @@ const EditTaskModal = ({
   useEffect(() => {
     if (editTask) {
       setValue("title", editTask.title);
-      setValue("projectId", managerProject._id);
+      if (managerProject) {
+        setValue("projectId", managerProject._id);
+      } else {
+        setValue("projectId", projectId);
+      }
       setValue("description", editTask.description);
       setValue("priority", editTask.priority);
       setValue("assignedTo", editTask.assignedTo);
@@ -30,7 +35,7 @@ const EditTaskModal = ({
           : ""
       );
     }
-  }, [editTask, setValue, managerProject]);
+  }, [editTask, setValue, managerProject, projectId]);
 
   if (!showEditTaskModal) return null;
 
@@ -205,6 +210,7 @@ EditTaskModal.propTypes = {
   editTask: PropTypes.object.isRequired,
   handleEditTask: PropTypes.func.isRequired,
   users: PropTypes.array.isRequired,
+  projectId: PropTypes.string,
   dependencyOptions: PropTypes.array.isRequired,
   darkMode: PropTypes.bool.isRequired,
 };

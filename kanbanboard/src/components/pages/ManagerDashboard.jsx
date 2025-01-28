@@ -46,22 +46,11 @@ const ManagerDashboard = () => {
   });
   const [showLogModal, setShowLogModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  // const [newTask, setNewTask] = useState({
-  //   title: "",
-  //   content: "",
-  //   description: "",
-  //   priority: "medium",
-  //   assignedTo: "",
-  //   dueDate: "",
-  //   projectId: "",
-  //   projectName: "",
-  //   status: "todo",
-  // });
   const [priorityFilter, setPriorityFilter] = useState("");
 
   if (!localStorage.getItem("authToken")) {
     console.error("User is not authenticated.");
-    location.href = "/";
+    navigate("/");
   }
 
   useEffect(() => {
@@ -69,62 +58,6 @@ const ManagerDashboard = () => {
     dispatch(fetchUsers());
     dispatch(fetchManagerProject());
   }, [dispatch]);
-
-  // const fetchTasks = async () => {
-  //   console.log("Fetching tasks...");
-  //   try {
-  //     const token = localStorage.getItem("authToken");
-  //     const { data } = await axiosInstance.get("/tasks/manager-project-tasks", {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     });
-
-  //     // Update dependency options for tasks
-  //     setDependencyOptions(data);
-
-  //     // Group and sort tasks by their status and order
-  //     const groupedTasks = {
-  //       todo: {
-  //         name: "To Do",
-  //         items: data
-  //           .filter((task) => task.status === "todo")
-  //           .sort((a, b) => a.order - b.order),
-  //       },
-  //       inprogress: {
-  //         name: "In Progress",
-  //         items: data
-  //           .filter((task) => task.status === "inprogress")
-  //           .sort((a, b) => a.order - b.order),
-  //       },
-  //       done: {
-  //         name: "Done",
-  //         items: data
-  //           .filter((task) => task.status === "done")
-  //           .sort((a, b) => a.order - b.order),
-  //       },
-  //     };
-
-  //     // Update columns state with grouped and ordered tasks
-  //     setColumns(groupedTasks);
-  //   } catch (error) {
-  //     console.error("Error fetching tasks:", error.message);
-  //   }
-  // };
-
-  // const fetchUsers = async () => {
-  //   try {
-  //     const token = localStorage.getItem("authToken");
-  //     const { data } = await axiosInstance.get("/users", {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     });
-  //     setUsers(data.filter((user) => user.role === "user"));
-  //   } catch (error) {
-  //     console.error("Error fetching users:", error.message);
-  //   }
-  // };
 
   useEffect(() => {
     if (tasks.length > 0) {
@@ -155,29 +88,7 @@ const ManagerDashboard = () => {
     }
   }, [tasks]);
 
-  // const fetchProjectForManager = async () => {
-  //   try {
-  //     const token = localStorage.getItem("authToken");
-  //     const { data } = await axiosInstance.get("/projects/manager", {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     });
-  //     const project = data[0]; // Assuming the manager has only one project
-  //     if (project) {
-  //       setNewTask((prevTask) => ({
-  //         ...prevTask,
-  //         projectId: project._id,
-  //         projectName: project.name,
-  //       }));
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching project:", error.message);
-  //   }
-  // };
-
   const handleAddTaskClick = () => {
-    // fetchProjectForManager();
     if (managerProject) {
       setValue("projectId", managerProject._id);
       setValue("projectName", managerProject.name);
@@ -186,41 +97,9 @@ const ManagerDashboard = () => {
   };
 
   const handleAddTask = (data) => {
-    console.log(`data for add task is ${data}`);
     dispatch(addTask(data));
     setShowAddTaskModal(false);
     reset();
-    // e.preventDefault();
-
-    // try {
-    //   const token = localStorage.getItem("authToken");
-    //   const formData = new FormData();
-    //   formData.append("title", newTask.title);
-    //   formData.append("description", newTask.description);
-    //   formData.append("priority", newTask.priority);
-    //   formData.append("assignedTo", newTask.assignedTo);
-    //   formData.append("projectId", newTask.projectId);
-    //   formData.append("dueDate", newTask.dueDate);
-    //   formData.append("status", newTask.status);
-    //   if (newTask.attachment) {
-    //     formData.append("attachment", newTask.attachment);
-    //   }
-    //   console.log(`newTask dependencies are: ${newTask.dependencies}`);
-    //   if (newTask.dependencies) {
-    //     formData.append("dependencies", JSON.stringify(newTask.dependencies));
-    //   }
-    //   await axiosInstance.post("/tasks", formData, {
-    //     headers: {
-    //       Authorization: `Bearer ${token}`,
-    //       "Content-Type": "multipart/form-data",
-    //     },
-    //   });
-
-    //   setShowAddTaskModal(false);
-    //   fetchTasks(); // Refresh tasks after adding
-    // } catch (error) {
-    //   console.error("Error adding task:", error.message);
-    // }
   };
 
   const handleEditTaskClick = (task) => {
@@ -302,26 +181,6 @@ const ManagerDashboard = () => {
     );
 
     dispatch(fetchTasks());
-
-    // try {
-    //   const token = localStorage.getItem("authToken");
-    //   // Send updated order to the backend
-    //   await axiosInstance.put(
-    //     "/tasks/reorder",
-    //     {
-    //       updatedTask: removedTask,
-    //       tasks: updatedTaskData,
-    //       status: destination.droppableId, // Optionally include the status
-    //     },
-    //     {
-    //       headers: {
-    //         Authorization: `Bearer ${token}`,
-    //       },
-    //     }
-    //   );
-    // } catch (error) {
-    //   console.error("Error updating task order on the backend:", error.message);
-    // }
   };
 
   const getPriorityColor = (priority) => {
@@ -362,7 +221,6 @@ const ManagerDashboard = () => {
   };
 
   const handleFileChange = (e) => {
-    console.log(e.target.files[0]);
     setValue("attachment", e.target.files[0]);
   };
 
@@ -375,43 +233,6 @@ const ManagerDashboard = () => {
   useEffect(() => {
     dispatch(fetchUsername());
   }, [dispatch]);
-
-  // const fetchUsername = async () => {
-  //   try {
-  //     const token = localStorage.getItem("authToken");
-  //     const { data } = await axiosInstance.get("/auth/me", {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     });
-  //     setUsername(data.username);
-  //   } catch (error) {
-  //     console.error("Error fetching username:", error.message);
-  //   }
-  // };
-
-  //const [managerProject, setManagerProject] = useState(false);
-  // useEffect(() => {
-  //   const checkManagerProject = async () => {
-  //     try {
-  //       const token = localStorage.getItem("authToken");
-  //       const { data } = await axiosInstance.get("/projects/manager", {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       });
-  //       if (data.length === 0) {
-  //         setColumns(null);
-  //       } else {
-  //         setManagerProject(true);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error checking manager project:", error.message);
-  //     }
-  //   };
-
-  //   checkManagerProject();
-  // }, []);
 
   const toggleUserDropdown = () => {
     setIsUserDropdownOpen(!isUserDropdownOpen);

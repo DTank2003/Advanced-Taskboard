@@ -11,7 +11,6 @@ export const fetchActivityLogs = createAsyncThunk(
                     Authorization: `Bearer ${token}`,
                 },
             });
-            console.log("fetched activity logs:");
             return data;
         } catch(error) {
             return rejectWithValue(error.response.data);

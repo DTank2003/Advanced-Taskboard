@@ -1,11 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { addProject, deleteProject, editProject, fetchManagerProject, fetchProjects } from '../actions/projectActions';
+import { addProject, deleteProject, editProject, fetchManagerProject, fetchTasksByProject, fetchProjects, fetchProjectAnalytics } from '../actions/projectActions';
 
 const projectSlice = createSlice( {
     name: "projects",
     initialState: {
         projects: [],
+        tasks: [],
         managerProject: null,
+        analyticsData: null,
         loading: false,
         error: null,
     },
@@ -78,8 +80,32 @@ const projectSlice = createSlice( {
           .addCase(fetchManagerProject.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload;
+          })
+          .addCase(fetchTasksByProject.pending, (state) => {
+            state.loading = true;
+            state.error = null;
+          })
+          .addCase(fetchTasksByProject.fulfilled, (state, action) => {
+            state.loading = false;
+            state.tasks = action.payload;
+          })
+          .addCase(fetchTasksByProject.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+          })
+          .addCase(fetchProjectAnalytics.pending, (state) => {
+            state.loading = true;
+            state.error = null;
+          })
+          .addCase(fetchProjectAnalytics.fulfilled, (state, action) => {
+            state.loading = false;
+            state.analyticsData = action.payload;
+          })
+          .addCase(fetchProjectAnalytics.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
           });
-    },
+    }, 
 });
 
 export default projectSlice.reducer;

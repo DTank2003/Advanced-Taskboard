@@ -5,8 +5,10 @@ import commentReducer from "../slices/commentSlice"
 import projectReducer from '../slices/projectSlice';
 import userReducer from '../slices/userSlice';
 import taskReducer from '../slices/taskSlice';
+import authReducer from '../slices/authSlice';
 
 const rootReducer = combineReducers({
+    auth: authReducer,
     tasks: taskReducer,
     users: userReducer,
     projects: projectReducer,

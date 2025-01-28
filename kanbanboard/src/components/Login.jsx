@@ -1,10 +1,10 @@
 import InputField from "./InputField";
 import Button from "./Button";
 import { useState } from "react";
-import axiosInstance from "../utils/axiosInstance";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser } from "../redux/actions/authActions";
 import { fetchNotifications } from "../redux/actions/notificationActions";
-import { useDispatch } from "react-redux";
 import { loginSchema } from "../utils/validationSchemas";
 
 const Login = () => {
@@ -13,6 +13,12 @@ const Login = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const {
+    loading,
+    role,
+    userId,
+    error: loginError,
+  } = useSelector((state) => state.auth);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -25,34 +31,26 @@ const Login = () => {
       return;
     }
 
-    try {
-      const response = await axiosInstance.post("/auth/login", {
-        email,
-        password,
-      });
+    const resultAction = await dispatch(loginUser({ email, password }));
 
-      const { token } = response.data;
+    if (loginUser.fulfilled.match(resultAction)) {
+      const { role, userId } = resultAction.payload;
 
-      localStorage.setItem("authToken", token);
-      if (response.data.role === "user") {
-        dispatch(fetchNotifications(response.data._id));
+      if (role === "user") {
+        dispatch(fetchNotifications(userId));
       }
 
-      if (response.data.role === "admin") {
+      if (role === "admin") {
         navigate("/admin/dashboard");
-      } else if (response.data.role === "manager") {
+      } else if (role === "manager") {
         navigate("/manager/dashboard");
-      } else if (response.data.role === "user") {
+      } else if (role === "user") {
         navigate("/user/dashboard");
       }
 
       alert("Login successful!");
-    } catch (err) {
-      if (err.status === 429) {
-        setError("Limit reached!");
-      } else {
-        setError(err.response?.data?.message || "Something went wrong");
-      }
+    } else {
+      setError(resultAction.payload || "Something went wrong");
     }
   };
 
@@ -80,9 +78,12 @@ const Login = () => {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter your password"
           />
-          <Button text="Login" onClick={handleLogin} />
+          <Button text="Login" onClick={handleLogin} disabled={loading} />
         </form>
         {error && <p className="text-red-500 text-center mt-4">{error}</p>}
+        {loginError && (
+          <p className="text-red-500 text-center mt-4">{loginError}</p>
+        )}
         <p className="text-center text-gray-600 mt-4">
           Donot have an account?{" "}
           <Link to="/signup" className="text-blue-500 hover:underline">

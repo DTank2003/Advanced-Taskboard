@@ -1,5 +1,23 @@
 import PropTypes from "prop-types";
 import { Bar, Doughnut } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+} from "chart.js";
+
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend,
+  BarElement,
+  CategoryScale,
+  LinearScale
+);
 
 const AnalyticsModal = ({ isOpen, onClose, analyticsData, darkMode }) => {
   if (!isOpen) return null;
@@ -42,33 +60,46 @@ const AnalyticsModal = ({ isOpen, onClose, analyticsData, darkMode }) => {
     <div
       className={`fixed inset-0 ${overlayClass} flex items-center justify-center`}
     >
-      <div className={`${modalBackgroundClass} p-6 rounded-lg w-3/4`}>
-        <h2 className={`text-xl font-semibold mb-4 ${textClass}`}>
+      <div
+        className={`relative p-6 rounded-md ${modalBackgroundClass} w-full max-w-4xl mx-4 max-h-lvh overflow-y-auto`}
+      >
+        <h2 className={`text-lg font-semibold mb-4 ${textClass}`}>
           Project Analytics
         </h2>
         <button
           onClick={onClose}
-          className={`${buttonClass} text-white px-4 py-2 rounded float-right`}
+          className={`absolute top-4 right-4 ${buttonClass} text-white rounded-full px-4 py-2`}
         >
           Close
         </button>
         <div className="mb-4">
-          <h3 className={`text-lg font-medium ${textClass}`}>
-            Task Completion: {completionPercentage}%
+          <h3 className={`text-md font-medium mb-2 ${textClass}`}>
+            Completion Percentage
           </h3>
-          <div className="w-full bg-gray-200 rounded-full h-4">
-            <div
-              className="bg-green-500 h-4 rounded-full"
-              style={{ width: `${completionPercentage}%` }}
-            ></div>
+          <p className={`text-2xl font-bold ${textClass}`}>
+            {completionPercentage}%
+          </p>
+        </div>
+        <div className="mb-4">
+          <h3 className={`text-md font-medium mb-2 ${textClass}`}>
+            Tasks by Status
+          </h3>
+          <div className="w-full h-64">
+            <Bar
+              data={tasksByStatusData}
+              options={{ maintainAspectRatio: false }}
+            />
           </div>
         </div>
-        <div className="flex flex-col md:flex-row gap-6">
-          <div className="w-full md:w-1/2">
-            <Bar data={tasksByStatusData} />
-          </div>
-          <div className="w-full md:w-1/2">
-            <Doughnut data={tasksByPriorityData} />
+        <div className="mb-4">
+          <h3 className={`text-md font-medium mb-2 ${textClass}`}>
+            Tasks by Priority
+          </h3>
+          <div className="w-full h-64">
+            <Doughnut
+              data={tasksByPriorityData}
+              options={{ maintainAspectRatio: false }}
+            />
           </div>
         </div>
       </div>

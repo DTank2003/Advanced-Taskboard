@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { addTask, deleteTask, fetchTasks, reorderTasks, updateTask } from "../actions/taskActions";
+import { addTask, deleteTask, fetchTasks, fetchTasksForUser, reorderTasks, updateTask } from "../actions/taskActions";
 
 const taskSlice = createSlice({
     name: 'tasks',
@@ -79,6 +79,18 @@ const taskSlice = createSlice({
         }
       })
       .addCase(reorderTasks.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchTasksForUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchTasksForUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.tasks = action.payload;
+      })
+      .addCase(fetchTasksForUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

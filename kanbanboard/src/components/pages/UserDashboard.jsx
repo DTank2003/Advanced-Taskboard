@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import axiosInstance from "../../utils/axiosInstance";
 import { Link, useNavigate } from "react-router-dom";
 import {
   FaComment,
@@ -13,10 +12,19 @@ import {
 import AddCommentModal from "./AddCommentModal";
 import ActivityLogModal from "./ActivityLogModal";
 import NotificationDropdown from "./NotificationDropdown";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchNotifications } from "../../redux/actions/notificationActions";
+import {
+  fetchTasksForUser,
+  reorderTasks,
+} from "../../redux/actions/taskActions";
+import { fetchUsername } from "../../redux/actions/userActions";
 
 const UserDashboard = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { tasks } = useSelector((state) => state.tasks);
+  const { currentUsername } = useSelector((state) => state.users);
   const [showLogModal, setShowLogModal] = useState(false);
   const [dependencyOptions, setDependencyOptions] = useState([]);
   const [columns, setColumns] = useState({
@@ -38,10 +46,6 @@ const UserDashboard = () => {
   const [showCommentsModal, setShowCommentsModal] = useState(false);
   const [darkMode, setDarkMode] = useState(true); // Dark mode state
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
-  const [username, setUsername] = useState("");
-
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const token = localStorage.getItem("authToken");
   if (!token) {
@@ -54,64 +58,38 @@ const UserDashboard = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    fetchTasks();
-    fetchUsername();
-  }, []);
+    dispatch(fetchTasksForUser());
+    dispatch(fetchUsername());
+  }, [dispatch]);
 
-  const fetchUsername = async () => {
-    try {
-      const token = localStorage.getItem("authToken");
-      const { data } = await axiosInstance.get("/auth/me", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setUsername(data.username);
-    } catch (error) {
-      console.error("Error fetching username:", error.message);
-    }
-  };
+  useEffect(() => {
+    if (tasks.length > 0) {
+      setDependencyOptions(tasks);
 
-  const fetchTasks = async () => {
-    try {
-      const token = localStorage.getItem("authToken");
-      const { data } = await axiosInstance.get("/tasks/user-tasks", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      // Update dependency options for tasks
-      setDependencyOptions(data);
-
-      // Group and sort tasks by their status and order
       const groupedTasks = {
         todo: {
           name: "To Do",
-          items: data
+          items: tasks
             .filter((task) => task.status === "todo")
             .sort((a, b) => a.order - b.order),
         },
         inprogress: {
           name: "In Progress",
-          items: data
+          items: tasks
             .filter((task) => task.status === "inprogress")
             .sort((a, b) => a.order - b.order),
         },
         done: {
           name: "Done",
-          items: data
+          items: tasks
             .filter((task) => task.status === "done")
             .sort((a, b) => a.order - b.order),
         },
       };
 
-      // Update columns state with grouped and ordered tasks
       setColumns(groupedTasks);
-    } catch (error) {
-      console.error("Error fetching tasks:", error.message);
     }
-  };
+  }, [tasks]);
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
@@ -147,67 +125,50 @@ const UserDashboard = () => {
 
     const taskToMove = columns[source.droppableId]?.items[source.index];
 
-    // Dependency validation for moving to "done" column
     if (
       destination.droppableId === "done" &&
       taskToMove?.dependencies?.length > 0
     ) {
-      const incompleteDependencies =
-        taskToMove.dependencies.filter(
-          (depId) => !columns.done.items.some((task) => task._id === depId)
-        ) || [];
+      const incompleteDependencies = taskToMove.dependencies.filter(
+        (depId) => !columns.done.items.some((task) => task._id === depId)
+      );
       if (incompleteDependencies.length > 0) {
         alert("Cannot move task to Done until all dependencies are completed!");
         return;
       }
     }
 
-    // Deep copy columns to avoid direct mutation
     const updatedColumns = structuredClone(columns);
 
     const sourceItems = updatedColumns[source.droppableId].items;
     const destItems = updatedColumns[destination.droppableId].items;
 
-    // Remove task from source and add it to destination
     const [removedTask] = sourceItems.splice(source.index, 1);
     destItems.splice(destination.index, 0, removedTask);
 
-    // Recalculate the order for tasks in the destination column
     const reorderedTasks = destItems.map((task, index) => ({
       ...task,
       order: index,
     }));
 
-    // Update columns in the frontend
     updatedColumns[destination.droppableId].items = reorderedTasks;
     updatedColumns[source.droppableId].items = sourceItems;
     setColumns(updatedColumns);
 
-    // Prepare data for the backend
     const updatedTaskData = reorderedTasks.map((task) => ({
       _id: task._id,
       order: task.order,
     }));
 
-    try {
-      const token = localStorage.getItem("authToken");
-      // Send updated order to the backend
-      await axiosInstance.put(
-        "/tasks/reorder",
-        {
-          updatedTask: removedTask,
-          tasks: updatedTaskData,
-          status: destination.droppableId, // Optionally include the status
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-    } catch (error) {
-      console.error("Error updating task order on the backend:", error.message);
-    }
+    await dispatch(
+      reorderTasks({
+        updatedTask: removedTask,
+        tasks: updatedTaskData,
+        status: destination.droppableId,
+      })
+    );
+
+    dispatch(fetchTasksForUser());
   };
 
   const getPriorityColor = (priority) => {
@@ -311,7 +272,7 @@ const UserDashboard = () => {
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-10">
                 <p className="px-4 py-2 text-gray-700">
                   Logged in as:{" "}
-                  <span className="font-semibold">{username}</span>
+                  <span className="font-semibold">{currentUsername}</span>
                 </p>
                 <hr className="border-t border-gray-300 my-2" />
                 <button

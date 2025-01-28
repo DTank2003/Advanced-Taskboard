@@ -36,7 +36,7 @@ const TasksList = ({
                   <div
                     {...provided.droppableProps}
                     ref={provided.innerRef}
-                    className={`p-4 rounded-lg shadow-md overflow-y-scroll w-full min-h-[540px] max-h-[540px] ${
+                    className={`p-4 rounded-lg shadow-md overflow-y-scroll w-full h-[450px] ${
                       darkMode ? "bg-gray-800 text-white" : "bg-white"
                     }`}
                   >

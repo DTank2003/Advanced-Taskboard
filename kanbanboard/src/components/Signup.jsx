@@ -1,10 +1,10 @@
 import InputField from "./InputField";
 import Button from "./Button";
 import { useState } from "react";
-import axiosInstance from "../utils/axiosInstance";
 import Confetti from "react-confetti";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { signupUser } from "../redux/actions/authActions";
 import { fetchNotifications } from "../redux/actions/notificationActions";
 import { signupSchema } from "../utils/validationSchemas";
 
@@ -19,6 +19,8 @@ const Signup = () => {
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const dispatch = useDispatch();
+  const { loading, error: signupError } = useSelector((state) => state.auth);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -34,29 +36,28 @@ const Signup = () => {
       return;
     }
 
-    try {
-      const response = await axiosInstance.post("/auth/register", formData);
+    const resultAction = await dispatch(signupUser(formData));
 
+    if (signupUser.fulfilled.match(resultAction)) {
       setSuccess(true);
 
-      const { token } = response.data;
+      const { role, userId } = resultAction.payload;
 
-      localStorage.setItem("authToken", token);
-
-      if (response.data.role === "user") {
-        dispatch(fetchNotifications(response.data._id));
+      if (role === "user") {
+        dispatch(fetchNotifications(userId));
       }
+
       setTimeout(() => {
-        if (response.data.role === "admin") {
+        if (role === "admin") {
           navigate("/admin/dashboard");
-        } else if (response.data.role === "manager") {
+        } else if (role === "manager") {
           navigate("/manager/dashboard");
-        } else if (response.data.role === "user") {
+        } else if (role === "user") {
           navigate("/user/dashboard");
         }
       }, 3000);
-    } catch (err) {
-      setError(err.response?.data?.message || "Something went wrong");
+    } else {
+      setError(resultAction.payload || "Something went wrong");
     }
   };
 
@@ -112,9 +113,12 @@ const Signup = () => {
                 <option value="manager">Manager</option>
               </select>
             </div>
-            <Button text="Signup" onClick={handleSignup} />
+            <Button text="Signup" onClick={handleSignup} disabled={loading} />
           </form>
           {error && <p className="text-red-500 text-center mt-4">{error}</p>}
+          {signupError && (
+            <p className="text-red-500 text-center mt-4">{signupError}</p>
+          )}
           {success && (
             <p className="text-green-500 text-center mt-4">
               Signup successful! Redirecting...

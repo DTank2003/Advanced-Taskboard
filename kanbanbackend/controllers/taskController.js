@@ -67,7 +67,6 @@ const createTask = async (req, res) => {
       status,
       dependencies = [],
     } = req.body;
-    console.log(req.file);
 
     const maxOrder = await Task.findOne({ status, projectId }).sort({ order: -1 }).exec();
     const newOrder = maxOrder ? maxOrder.order + 1: 1;
