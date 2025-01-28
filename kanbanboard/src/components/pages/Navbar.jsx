@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import { FaBell, FaMoon, FaSun, FaUser } from "react-icons/fa";
 import NotificationDropdown from "./NotificationDropdown";
+import { useSelector } from "react-redux";
 
 const Navbar = ({
   darkMode,
@@ -10,13 +11,14 @@ const Navbar = ({
   searchQuery,
   toggleUserDropdown,
   isUserDropdownOpen,
-  username,
   handleSearchChange,
   priorityFilter,
   handlePriorityFilterChange,
   handleAddTaskClick,
   handleLogout,
 }) => {
+  const { currentUsername } = useSelector((state) => state.users);
+
   return (
     <nav
       className={`bg-blue-600 text-white px-4 py-3 flex justify-between items-center shadow-lg ${
@@ -84,7 +86,8 @@ const Navbar = ({
           {isUserDropdownOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-10">
               <p className="px-4 py-2 text-gray-700">
-                Logged in as: <span className="font-semibold">{username}</span>
+                Logged in as:{" "}
+                <span className="font-semibold">{currentUsername}</span>
               </p>
               <hr className="border-t border-gray-300 my-2" />
               <button

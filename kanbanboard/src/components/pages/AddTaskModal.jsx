@@ -1,27 +1,41 @@
 import PropTypes from "prop-types";
+import { useForm } from "react-hook-form";
+import { useSelector } from "react-redux";
 
 const AddTaskModal = ({
   showAddTaskModal,
   setShowAddTaskModal,
-  newTask,
-  setNewTask,
   handleAddTask,
   users,
   dependencyOptions,
   darkMode,
   handleFileChange,
 }) => {
+  const { managerProject } = useSelector((state) => state.projects);
+
+  const { register, handleSubmit, reset, setValue } = useForm();
+
   if (!showAddTaskModal) return null;
+
+  const onSubmit = (data) => {
+    data.projectId = managerProject._id;
+    console.log(data);
+    handleAddTask(data);
+    reset();
+    setShowAddTaskModal(false);
+  };
+
+  const filteredUsers = users.filter((user) => user.role === "user");
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
       <div
-        className={`max-h-[700px] overflow-y-auto p-6 rounded-md ${
-          darkMode ? "bg-gray-800 text-white" : "bg-white"
+        className={`max-h-[700px] overflow-y-auto p-6 rounded-md shadow-lg ${
+          darkMode ? "bg-gray-900 text-white" : "bg-white"
         }`}
       >
         <h2 className="text-lg font-semibold mb-4">Add Task</h2>
-        <form onSubmit={handleAddTask} encType="multipart/form-data">
+        <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
           <div className="mb-4">
             <label
               className={`block font-medium mb-2 ${
@@ -32,13 +46,10 @@ const AddTaskModal = ({
             </label>
             <input
               type="text"
-              value={newTask.title}
-              onChange={(e) =>
-                setNewTask({ ...newTask, title: e.target.value })
-              }
+              {...register("title", { required: true })}
               className={`border rounded p-2 w-full ${
                 darkMode
-                  ? "bg-gray-700 text-white border-gray-600"
+                  ? "bg-gray-800 text-white border-gray-700"
                   : "border-gray-300"
               }`}
               required
@@ -53,13 +64,10 @@ const AddTaskModal = ({
               Description
             </label>
             <textarea
-              value={newTask.description}
-              onChange={(e) =>
-                setNewTask({ ...newTask, description: e.target.value })
-              }
+              {...register("description", { required: true })}
               className={`border rounded p-2 w-full ${
                 darkMode
-                  ? "bg-gray-700 text-white border-gray-600"
+                  ? "bg-gray-800 text-white border-gray-700"
                   : "border-gray-300"
               }`}
               required
@@ -74,13 +82,10 @@ const AddTaskModal = ({
               Priority
             </label>
             <select
-              value={newTask.priority}
-              onChange={(e) =>
-                setNewTask({ ...newTask, priority: e.target.value })
-              }
+              {...register("priority", { required: true })}
               className={`border rounded p-2 w-full ${
                 darkMode
-                  ? "bg-gray-700 text-white border-gray-600"
+                  ? "bg-gray-800 text-white border-gray-700"
                   : "border-gray-300"
               }`}
               required
@@ -99,19 +104,16 @@ const AddTaskModal = ({
               Assigned To
             </label>
             <select
-              value={newTask.assignedTo}
-              onChange={(e) =>
-                setNewTask({ ...newTask, assignedTo: e.target.value })
-              }
+              {...register("assignedTo", { required: true })}
               className={`border rounded p-2 w-full ${
                 darkMode
-                  ? "bg-gray-700 text-white border-gray-600"
+                  ? "bg-gray-800 text-white border-gray-700"
                   : "border-gray-300"
               }`}
               required
             >
               <option value="">Select User</option>
-              {users.map((user) => (
+              {filteredUsers.map((user) => (
                 <option key={user._id} value={user._id}>
                   {user.username}
                 </option>
@@ -129,20 +131,10 @@ const AddTaskModal = ({
             </label>
             <select
               multiple
-              value={newTask.dependencies}
-              onChange={(e) => {
-                const selectedDependencies = Array.from(
-                  e.target.selectedOptions,
-                  (option) => option.value
-                );
-                setNewTask({
-                  ...newTask,
-                  dependencies: selectedDependencies,
-                });
-              }}
+              {...register("dependencies")}
               className={`border rounded p-2 w-full ${
                 darkMode
-                  ? "bg-gray-700 text-white border-gray-600"
+                  ? "bg-gray-800 text-white border-gray-700"
                   : "border-gray-300"
               }`}
             >
@@ -163,15 +155,18 @@ const AddTaskModal = ({
                 darkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
-              File
+              Attachment
             </label>
             <input
               name="attachment"
               type="file"
-              onChange={handleFileChange}
+              onChange={(e) => {
+                handleFileChange(e);
+                setValue("attachment", e.target.files[0]);
+              }}
               className={`border rounded p-2 w-full ${
                 darkMode
-                  ? "bg-gray-700 text-white border-gray-600"
+                  ? "bg-gray-800 text-white border-gray-700"
                   : "border-gray-300"
               }`}
             />
@@ -186,16 +181,13 @@ const AddTaskModal = ({
             </label>
             <input
               type="date"
-              value={newTask.dueDate}
-              onChange={(e) =>
-                setNewTask({ ...newTask, dueDate: e.target.value })
-              }
+              {...register("dueDate", { required: true })}
               className={`border rounded p-2 w-full ${
                 darkMode
-                  ? "bg-gray-700 text-white border-gray-600"
+                  ? "bg-gray-800 text-white border-gray-700"
                   : "border-gray-300"
               }`}
-              //required
+              required
             />
           </div>
           <div className="flex justify-end">
@@ -222,8 +214,6 @@ const AddTaskModal = ({
 AddTaskModal.propTypes = {
   showAddTaskModal: PropTypes.bool.isRequired,
   setShowAddTaskModal: PropTypes.func.isRequired,
-  newTask: PropTypes.object.isRequired,
-  setNewTask: PropTypes.func.isRequired,
   handleAddTask: PropTypes.func.isRequired,
   users: PropTypes.array.isRequired,
   dependencyOptions: PropTypes.array.isRequired,

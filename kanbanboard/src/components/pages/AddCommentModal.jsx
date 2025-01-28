@@ -4,10 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchComments, addComment } from "../../redux/actions/commentActions";
 
 const AddCommentModal = ({ taskId, onClose, isDarkMode }) => {
-  // const [comments, setComments] = useState([]);
-  // const [newComment, setNewComment] = useState("");
-  // const [isLoading, setIsLoading] = useState(false);
-
   const [newComment, setNewComment] = useState("");
   const dispatch = useDispatch();
   const { comments, loading, error } = useSelector((state) => state.comments);
@@ -23,73 +19,6 @@ const AddCommentModal = ({ taskId, onClose, isDarkMode }) => {
     dispatch(addComment({ taskId, text: newComment }));
     setNewComment("");
   };
-
-  // Fetch comments for the specific task
-  // const fetchComments = async () => {
-  //   try {
-  //     const token = localStorage.getItem("authToken"); // Get the token from localStorage
-
-  //     if (!token) {
-  //       console.error("User is not authenticated.");
-  //       return;
-  //     }
-  //     const { data } = await axiosInstance.get(`/comments/${taskId}`, {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`, // Pass the token as Authorization header
-  //       },
-  //     });
-
-  //     setComments(data);
-  //   } catch (error) {
-  //     console.error("Error fetching comments:", error.message);
-  //   }
-  // };
-
-  // Add a new comment
-  // const handleAddComment = async (e) => {
-  //   e.preventDefault();
-  //   if (!newComment.trim()) return;
-
-  //   try {
-  //     setIsLoading(true);
-
-  //     const token = localStorage.getItem("authToken"); // Get the token from localStorage
-
-  //     if (!token) {
-  //       console.error("User is not authenticated.");
-  //       return;
-  //     }
-
-  //     if (!taskId || !newComment.trim()) {
-  //       console.error("Missing required fields: taskId, userId, or text");
-  //       return;
-  //     }
-
-  //     const { data } = await axiosInstance.post(
-  //       "/comments",
-  //       { taskId, text: newComment },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`, // Pass the token as Authorization header
-  //         },
-  //       }
-  //     );
-
-  //     setComments([data, ...comments]); // Add new comment to the list
-  //     setNewComment(""); // Clear input field
-  //   } catch (error) {
-  //     console.error(
-  //       "Error adding comment:",
-  //       error.response ? error.response.data : error.message
-  //     );
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchComments();
-  // }, [taskId]);
 
   return (
     <div

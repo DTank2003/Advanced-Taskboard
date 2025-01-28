@@ -1,10 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { addProject, deleteProject, editProject, fetchProjects } from '../actions/projectActions';
+import { addProject, deleteProject, editProject, fetchManagerProject, fetchProjects } from '../actions/projectActions';
 
 const projectSlice = createSlice( {
     name: "projects",
     initialState: {
         projects: [],
+        managerProject: null,
         loading: false,
         error: null,
     },
@@ -63,6 +64,18 @@ const projectSlice = createSlice( {
             );
           })
           .addCase(deleteProject.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+          }) 
+          .addCase(fetchManagerProject.pending, (state) => {
+            state.loading = true;
+            state.error = null;
+          })
+          .addCase(fetchManagerProject.fulfilled, (state, action) => {
+            state.loading = false;
+            state.managerProject = action.payload;
+          })
+          .addCase(fetchManagerProject.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload;
           });

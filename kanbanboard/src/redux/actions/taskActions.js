@@ -23,20 +23,21 @@ export const fetchTasks = createAsyncThunk(
     async (taskData, { rejectWithValue }) => {
       try {
         const token = localStorage.getItem('authToken');
-        const formData = new FormData();
-        Object.keys(taskData).forEach((key) => {
-          if (key === 'dependencies') {
-            formData.append(key, JSON.stringify(taskData[key]));
-          } else {
-            formData.append(key, taskData[key]);
-          }
-        });
-        const { data } = await axiosInstance.post('/tasks', formData, {
+        // const formData = new FormData();
+        // Object.keys(taskData).forEach((key) => {
+        //   if (key === 'dependencies') {
+        //     formData.append(key, JSON.stringify(taskData[key]));
+        //   } else {
+        //     formData.append(key, taskData[key]);
+        //   }
+        // });
+        const { data } = await axiosInstance.post('/tasks', taskData, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'multipart/form-data',
           },
         });
+        console.log(`AFTER ADDING NEW TASK, DATA IS ${data}`);
         return data;
       } catch (error) {
         return rejectWithValue(error.response.data);
@@ -44,7 +45,7 @@ export const fetchTasks = createAsyncThunk(
     }
   );
 
-  export const editTask = createAsyncThunk(
+  export const updateTask = createAsyncThunk(
     'tasks/editTask',
     async ({ taskId, taskData }, { rejectWithValue }) => {
       try {

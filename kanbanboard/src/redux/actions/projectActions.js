@@ -68,3 +68,20 @@ export const editProject = createAsyncThunk(
       }
     }
   );
+
+  export const fetchManagerProject = createAsyncThunk(
+    'projects/fetchManagerProject',
+    async (_, { rejectWithValue }) => {
+      try {
+        const token = localStorage.getItem('authToken');
+        const { data } = await axiosInstance.get('/projects/manager', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        return data[0]; // Assuming the manager has only one project
+      } catch (error) {
+        return rejectWithValue(error.response.data);
+      }
+    }
+  );

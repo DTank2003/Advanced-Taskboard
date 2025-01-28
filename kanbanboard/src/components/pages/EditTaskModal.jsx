@@ -1,16 +1,46 @@
 import PropTypes from "prop-types";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { useSelector } from "react-redux";
 
 const EditTaskModal = ({
   showEditTaskModal,
   setShowEditTaskModal,
   editTask,
-  setEditTask,
   handleEditTask,
   users,
   dependencyOptions,
   darkMode,
 }) => {
+  const { register, handleSubmit, reset, setValue } = useForm();
+  const { managerProject } = useSelector((state) => state.projects);
+
+  useEffect(() => {
+    if (editTask) {
+      setValue("title", editTask.title);
+      setValue("projectId", managerProject._id);
+      setValue("description", editTask.description);
+      setValue("priority", editTask.priority);
+      setValue("assignedTo", editTask.assignedTo);
+      setValue("dependencies", editTask.dependencies);
+      setValue(
+        "dueDate",
+        editTask.dueDate
+          ? new Date(editTask.dueDate).toISOString().split("T")[0]
+          : ""
+      );
+    }
+  }, [editTask, setValue, managerProject]);
+
   if (!showEditTaskModal) return null;
+
+  const onSubmit = (data) => {
+    handleEditTask({ ...editTask, ...data });
+    reset();
+    setShowEditTaskModal(false);
+  };
+
+  const filteredUsers = users.filter((user) => user.role === "user");
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
@@ -20,7 +50,7 @@ const EditTaskModal = ({
         }`}
       >
         <h2 className="text-lg font-semibold mb-4">Edit Task</h2>
-        <form onSubmit={handleEditTask}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
             <label
               className={`block font-medium mb-2 ${
@@ -31,10 +61,7 @@ const EditTaskModal = ({
             </label>
             <input
               type="text"
-              value={editTask.title}
-              onChange={(e) =>
-                setEditTask({ ...editTask, title: e.target.value })
-              }
+              {...register("title", { required: true })}
               className={`border rounded p-2 w-full ${
                 darkMode
                   ? "bg-gray-700 text-white border-gray-600"
@@ -52,10 +79,7 @@ const EditTaskModal = ({
               Description
             </label>
             <textarea
-              value={editTask.description}
-              onChange={(e) =>
-                setEditTask({ ...editTask, description: e.target.value })
-              }
+              {...register("description", { required: true })}
               className={`border rounded p-2 w-full ${
                 darkMode
                   ? "bg-gray-700 text-white border-gray-600"
@@ -73,10 +97,7 @@ const EditTaskModal = ({
               Priority
             </label>
             <select
-              value={editTask.priority}
-              onChange={(e) =>
-                setEditTask({ ...editTask, priority: e.target.value })
-              }
+              {...register("priority", { required: true })}
               className={`border rounded p-2 w-full ${
                 darkMode
                   ? "bg-gray-700 text-white border-gray-600"
@@ -98,10 +119,7 @@ const EditTaskModal = ({
               Assigned To
             </label>
             <select
-              value={editTask.assignedTo}
-              onChange={(e) =>
-                setEditTask({ ...editTask, assignedTo: e.target.value })
-              }
+              {...register("assignedTo", { required: true })}
               className={`border rounded p-2 w-full ${
                 darkMode
                   ? "bg-gray-700 text-white border-gray-600"
@@ -110,7 +128,7 @@ const EditTaskModal = ({
               required
             >
               <option value="">Select User</option>
-              {users.map((user) => (
+              {filteredUsers.map((user) => (
                 <option key={user._id} value={user._id}>
                   {user.username}
                 </option>
@@ -127,17 +145,7 @@ const EditTaskModal = ({
             </label>
             <select
               multiple
-              value={editTask.dependencies}
-              onChange={(e) => {
-                const selectedDependencies = Array.from(
-                  e.target.selectedOptions,
-                  (option) => option.value
-                );
-                setEditTask({
-                  ...editTask,
-                  dependencies: selectedDependencies,
-                });
-              }}
+              {...register("dependencies")}
               className={`border rounded p-2 w-full ${
                 darkMode
                   ? "bg-gray-700 text-white border-gray-600"
@@ -161,16 +169,13 @@ const EditTaskModal = ({
             </label>
             <input
               type="date"
-              value={editTask.dueDate}
-              onChange={(e) =>
-                setEditTask({ ...editTask, dueDate: e.target.value })
-              }
+              {...register("dueDate", { required: true })}
               className={`border rounded p-2 w-full ${
                 darkMode
                   ? "bg-gray-700 text-white border-gray-600"
                   : "border-gray-300"
               }`}
-              // required
+              required
             />
           </div>
           <div className="flex justify-end">
@@ -198,7 +203,6 @@ EditTaskModal.propTypes = {
   showEditTaskModal: PropTypes.bool.isRequired,
   setShowEditTaskModal: PropTypes.func.isRequired,
   editTask: PropTypes.object.isRequired,
-  setEditTask: PropTypes.func.isRequired,
   handleEditTask: PropTypes.func.isRequired,
   users: PropTypes.array.isRequired,
   dependencyOptions: PropTypes.array.isRequired,

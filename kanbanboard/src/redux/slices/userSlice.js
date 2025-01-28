@@ -1,10 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {fetchUsers} from "../actions/userActions";
+import {fetchUsername, fetchUsers} from "../actions/userActions";
 
 const userSlice = createSlice({
     name: "users",
     initialState: {
         users: [],
+        currentUsername: "",
         loading: false,
         error: null,
     },
@@ -23,6 +24,18 @@ const userSlice = createSlice({
                 state.error = action.payload;
                 state.loading = false;
             })
+            .addCase(fetchUsername.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchUsername.fulfilled, (state, action) => {
+                state.currentUsername = action.payload;
+                state.loading = false;
+            })
+            .addCase(fetchUsername.rejected, (state, action) => {
+                state.error = action.payload;
+                state.loading = false;
+            });
     },
 })
 
