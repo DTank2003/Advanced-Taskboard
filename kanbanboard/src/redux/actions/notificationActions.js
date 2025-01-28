@@ -28,3 +28,18 @@ export const markNotificationAsRead = (id) => async (dispatch) => {
     console.error("Error marking notification as read:", error.message);
   }
 };
+
+export const markAllAsRead = () => async (dispatch) => {
+  try {
+    const token = localStorage.getItem("authToken");
+    await axiosInstance.patch(`/notifications/markAllAsRead`, {},
+      { headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    dispatch(markAsRead({ all: true }));
+  } catch (error) {
+    console.error("Error marking all notifications as read:", error.message);
+  }
+};

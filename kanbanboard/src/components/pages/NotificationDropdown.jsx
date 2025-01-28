@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   fetchNotifications,
+  markAllAsRead,
   markNotificationAsRead,
 } from "../../redux/actions/notificationActions";
 import PropTypes from "prop-types";
@@ -30,17 +31,13 @@ const NotificationDropdown = ({ onClose }) => {
   }, [dispatch, onClose]);
 
   const handleMarkAsRead = async (id) => {
-    dispatch(markNotificationAsRead(id));
+    await dispatch(markNotificationAsRead(id));
     dispatch(fetchNotifications());
   };
 
   const handleMarkAllRead = async () => {
-    const unreadNotifications = notifications.filter(
-      (notification) => !notification.read
-    );
-    for (const notification of unreadNotifications) {
-      dispatch(markNotificationAsRead(notification._id));
-    }
+    await dispatch(markAllAsRead());
+    dispatch(fetchNotifications());
   };
 
   return (

@@ -180,7 +180,7 @@ const ManagerDashboard = () => {
       })
     );
 
-    dispatch(fetchTasks());
+    //dispatch(fetchTasks());
   };
 
   const getPriorityColor = (priority) => {

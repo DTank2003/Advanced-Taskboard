@@ -160,15 +160,13 @@ const UserDashboard = () => {
       order: task.order,
     }));
 
-    await dispatch(
+    dispatch(
       reorderTasks({
         updatedTask: removedTask,
         tasks: updatedTaskData,
         status: destination.droppableId,
       })
     );
-
-    dispatch(fetchTasksForUser());
   };
 
   const getPriorityColor = (priority) => {

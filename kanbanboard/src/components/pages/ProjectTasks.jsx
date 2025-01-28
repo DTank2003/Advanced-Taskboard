@@ -208,7 +208,7 @@ const ProjectTasks = () => {
       })
     );
 
-    dispatch(fetchTasksByProject());
+    //dispatch(fetchTasksByProject());
   };
 
   const getPriorityColor = (priority) => {

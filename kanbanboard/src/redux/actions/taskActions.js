@@ -101,6 +101,7 @@ export const reorderTasks = createAsyncThunk(
           },
         }
       );
+      await dispatchEvent(fetchTasksForUser());
       return { updatedTask, tasks, status };
     } catch (error) {
       return rejectWithValue(error.response.data);

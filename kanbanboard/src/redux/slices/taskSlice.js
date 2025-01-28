@@ -72,11 +72,12 @@ const taskSlice = createSlice({
       })
       .addCase(reorderTasks.fulfilled, (state, action) => {
         state.loading = false;
-        const { tasks, status } = action.payload;
-        const column = state.tasks.find((col) => col.status === status);
-        if (column) {
-          column.items = tasks;
-        }
+        state.tasks = action.payload;
+        // const { tasks, status } = action.payload;
+        // const column = state.tasks.find((col) => col.status === status);
+        // if (column) {
+        //   column.items = tasks;
+        // }
       })
       .addCase(reorderTasks.rejected, (state, action) => {
         state.loading = false;
