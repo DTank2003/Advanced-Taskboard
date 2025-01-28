@@ -1,107 +1,58 @@
 import { useState, useEffect } from "react";
-import axiosInstance from "../../utils/axiosInstance";
 import AddProjectModal from "./AddProjectModal";
 import EditProjectModal from "./EditProjectModal";
 import { useNavigate } from "react-router-dom";
 import { FaEdit, FaTrash, FaSun, FaMoon } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addProject,
+  deleteProject,
+  editProject,
+  fetchProjects,
+} from "../../redux/actions/projectActions";
+import { fetchUsers } from "../../redux/actions/userActions";
 
 const AdminDashboard = () => {
-  const [projects, setProjects] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [editProject, setEditProject] = useState(null);
+  //const [projects, setProjects] = useState([]);
+  // const [users, setUsers] = useState([]);
+  const { projects, loading, error } = useSelector((state) => state.projects);
+
+  const [edittProject, setEdittProject] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const navigate = useNavigate();
+  const [darkMode, setDarkMode] = useState(true);
 
   if (!localStorage.getItem("authToken")) {
     console.error("User is not authenticated.");
-    location.href = "/";
+    navigate("/");
   }
 
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   useEffect(() => {
-    fetchProjects();
-  }, []);
-
-  const fetchProjects = async () => {
-    try {
-      const token = localStorage.getItem("authToken"); // Get the token from localStorage
-
-      if (!token) {
-        console.error("User is not authenticated.");
-        return;
-      }
-      const { data } = await axiosInstance.get("/projects", {
-        headers: {
-          Authorization: `Bearer ${token}`, // Pass the token as Authorization header
-        },
-      });
-      setProjects(data);
-    } catch (error) {
-      console.error("Error fetching projects:", error.message);
-    }
-  };
-
-  const fetchUsers = async () => {
-    try {
-      const response = await axiosInstance.get("/users");
-      // const managers = response.data.filter(user => user.role === 'manager');
-      // setUsers(managers);
-      setUsers(response.data);
-      console.log(response.data);
-    } catch (error) {
-      console.error("Error fetching users: ", error);
-    }
-  };
+    dispatch(fetchProjects());
+  }, [dispatch]);
 
   const handleAddProject = async (projectData) => {
-    try {
-      const token = localStorage.getItem("authToken");
-      await axiosInstance.post("/projects", projectData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      fetchProjects(); // Refresh projects after adding
-      setShowAddModal(false); // Close the Add Project modal
-    } catch (error) {
-      console.error("Error adding project:", error.message);
-    }
+    dispatch(addProject(projectData));
+    setShowAddModal(false);
   };
 
   const handleEditProjectClick = async (project) => {
-    await fetchUsers();
-    setEditProject(project);
+    dispatch(fetchUsers());
+    setEdittProject(project);
     setShowEditModal(true);
   };
 
   const handleEditProject = async (projectData) => {
-    try {
-      const token = localStorage.getItem("authToken");
-      await axiosInstance.put(`/projects/${editProject._id}`, projectData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      fetchProjects(); // Refresh projects after editing
-      setShowEditModal(false);
-      setEditProject(null);
-    } catch (error) {
-      console.error("Error editing project:", error.message);
-    }
+    dispatch(editProject({ projectId: edittProject._id, projectData }));
+    setShowEditModal(false);
+    setEdittProject(null);
   };
 
   const handleDeleteProject = async (projectId) => {
-    try {
-      const token = localStorage.getItem("authToken");
-      await axiosInstance.delete(`/projects/${projectId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      fetchProjects(); // Refresh projects after deleting
-    } catch (error) {
-      console.error("Error deleting project:", error.message);
-    }
+    dispatch(deleteProject(projectId));
   };
 
   const handleLogout = () => {
@@ -112,8 +63,6 @@ const AdminDashboard = () => {
   const handleProjectClick = (projectId) => {
     navigate(`/projects/${projectId}/tasks`);
   };
-
-  const [darkMode, setDarkMode] = useState(true);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -135,8 +84,8 @@ const AdminDashboard = () => {
         <div className="flex space-x-4">
           <button
             onClick={() => {
-              fetchUsers(); // Fetch users for the modal
-              setShowAddModal(true); // Open the modal
+              dispatch(fetchUsers());
+              setShowAddModal(true);
             }}
             className={`px-4 py-2 rounded-lg shadow transition ${
               darkMode
@@ -172,70 +121,74 @@ const AdminDashboard = () => {
       {/* Project List */}
       <div className="p-6">
         <h2 className="text-2xl font-bold mb-4">Projects</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((project) => (
-            <div
-              key={project._id}
-              className={`p-4 shadow-md rounded-lg border transition ${
-                darkMode
-                  ? "bg-gray-800 border-gray-700 hover:shadow-lg"
-                  : "bg-white hover:shadow-lg"
-              }`}
-            >
-              <div className="flex justify-between items-center">
-                <div
-                  onClick={() => handleProjectClick(project._id)}
-                  className="cursor-pointer"
-                >
-                  <h3 className="text-xl font-semibold">{project.name}</h3>
-                  <p className="mt-2">Description: {project.description}</p>
-                  <p className="mt-2">
-                    Assigned Manager:{" "}
-                    {project.assignedManager
-                      ? project.assignedManager.username
-                      : "Nil"}
-                  </p>
-                  <p className="mt-2">
-                    Due Date:{" "}
-                    {project.dueDate
-                      ? new Date(project.dueDate).toLocaleDateString()
-                      : " Nil"}
-                  </p>
-                </div>
-                <div className="flex space-x-2">
-                  <FaEdit
-                    className="text-blue-600 cursor-pointer"
-                    onClick={() => handleEditProjectClick(project)}
-                  />
-                  <FaTrash
-                    className="text-red-600 cursor-pointer"
-                    onClick={() => handleDeleteProject(project._id)}
-                  />
+        {loading ? (
+          <p>Loading...</p>
+        ) : error ? (
+          <p className="text-red-500">Error: {error}</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {projects.map((project) => (
+              <div
+                key={project._id}
+                className={`p-4 shadow-md rounded-lg border transition ${
+                  darkMode
+                    ? "bg-gray-800 border-gray-700 hover:shadow-lg"
+                    : "bg-white hover:shadow-lg"
+                }`}
+              >
+                <div className="flex justify-between items-center">
+                  <div
+                    onClick={() => handleProjectClick(project._id)}
+                    className="cursor-pointer"
+                  >
+                    <h3 className="text-xl font-semibold">{project.name}</h3>
+                    <p className="mt-2">Description: {project.description}</p>
+                    <p className="mt-2">
+                      Assigned Manager:{" "}
+                      {project.assignedManager
+                        ? project.assignedManager.username
+                        : "Nil"}
+                    </p>
+                    <p className="mt-2">
+                      Due Date:{" "}
+                      {project.dueDate
+                        ? new Date(project.dueDate).toLocaleDateString()
+                        : " Nil"}
+                    </p>
+                  </div>
+                  <div className="flex space-x-2">
+                    <FaEdit
+                      className="text-blue-600 cursor-pointer"
+                      onClick={() => handleEditProjectClick(project)}
+                    />
+                    <FaTrash
+                      className="text-red-600 cursor-pointer"
+                      onClick={() => handleDeleteProject(project._id)}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Add Project Modal */}
       {showAddModal && (
         <AddProjectModal
-          isDarkMode
+          isDarkMode={darkMode}
           onClose={() => setShowAddModal(false)}
           onAddProject={handleAddProject}
-          users={users}
         />
       )}
 
       {/* Edit Project Modal */}
       {showEditModal && (
         <EditProjectModal
-          isDarkMode
+          isDarkMode={darkMode}
           onClose={() => setShowEditModal(false)}
           onEditProject={handleEditProject}
-          users={users}
-          project={editProject}
+          project={edittProject}
         />
       )}
     </div>

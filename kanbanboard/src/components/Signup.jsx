@@ -3,7 +3,7 @@ import Button from "./Button";
 import { useState } from "react";
 import axiosInstance from "../utils/axiosInstance";
 import Confetti from "react-confetti";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { fetchNotifications } from "../redux/actions/notificationActions";
 import { signupSchema } from "../utils/validationSchemas";
@@ -36,27 +36,22 @@ const Signup = () => {
 
     try {
       const response = await axiosInstance.post("/auth/register", formData);
-      console.log(response.data);
+
       setSuccess(true);
 
       const { token } = response.data;
 
       localStorage.setItem("authToken", token);
-      localStorage.setItem("userRole", response.data.role);
 
       if (response.data.role === "user") {
         dispatch(fetchNotifications(response.data._id));
       }
       setTimeout(() => {
         if (response.data.role === "admin") {
-          console.log("admin it is");
-
           navigate("/admin/dashboard");
         } else if (response.data.role === "manager") {
-          console.log("manager it is");
           navigate("/manager/dashboard");
         } else if (response.data.role === "user") {
-          console.log("user it is");
           navigate("/user/dashboard");
         }
       }, 3000);
@@ -122,14 +117,14 @@ const Signup = () => {
           {error && <p className="text-red-500 text-center mt-4">{error}</p>}
           {success && (
             <p className="text-green-500 text-center mt-4">
-              Signup successful! Please login.
+              Signup successful! Redirecting...
             </p>
           )}
           <p className="text-center text-gray-600 mt-4">
             Already have an account?{" "}
-            <a href="/" className="text-blue-500 hover:underline">
+            <Link to="/" className="text-blue-500 hover:underline">
               Login
-            </a>
+            </Link>
           </p>
         </div>
       </div>

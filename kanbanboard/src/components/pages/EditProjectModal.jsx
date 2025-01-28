@@ -1,47 +1,45 @@
 import PropTypes from "prop-types";
-import React, { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useForm } from "react-hook-form";
+import { fetchUsers } from "../../redux/actions/userActions";
 
-const EditProjectModal = ({
-  onClose,
-  onEditProject,
-  users,
-  project,
-  isDarkMode,
-}) => {
-  const [projectData, setProjectData] = useState({
-    name: "",
-    description: "",
-    assignedManager: "",
-    dueDate: "",
-  });
+const EditProjectModal = ({ onClose, onEditProject, project, isDarkMode }) => {
+  const { users } = useSelector((state) => state.users);
+  const { register, handleSubmit, reset, setValue } = useForm();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchUsers());
+  }, [dispatch]);
 
   useEffect(() => {
     if (project) {
-      setProjectData({
-        name: project.name,
-        description: project.description,
-        assignedManager: project.assignedManager
-          ? project.assignedManager._id
-          : "",
-        dueDate: project.dueDate
+      setValue("name", project.name);
+      setValue("description", project.description);
+      setValue(
+        "assignedManager",
+        project.assignedManager ? project.assignedManager._id : ""
+      );
+      setValue(
+        "dueDate",
+        project.dueDate
           ? new Date(project.dueDate).toISOString().split("T")[0]
-          : "",
-      });
+          : ""
+      );
     }
-  }, [project]);
+  }, [project, setValue]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setProjectData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+  const onSubmit = (data) => {
+    onEditProject(data);
+    reset();
+    onClose();
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onEditProject(projectData);
-  };
+  // Filter users to show only managers
+  const managerUsers = Array.isArray(users)
+    ? users.filter((user) => user.role === "manager")
+    : [];
 
   return (
     <div
@@ -55,14 +53,12 @@ const EditProjectModal = ({
         } p-6 rounded-md w-1/2`}
       >
         <h2 className="text-lg font-semibold mb-4">Edit Project</h2>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
             <label className="block font-medium mb-2">Name</label>
             <input
               type="text"
-              name="name"
-              value={projectData.name}
-              onChange={handleChange}
+              {...register("name", { required: true })}
               className={`border ${
                 isDarkMode
                   ? "border-gray-700 bg-gray-800 text-white"
@@ -74,9 +70,7 @@ const EditProjectModal = ({
           <div className="mb-4">
             <label className="block font-medium mb-2">Description</label>
             <textarea
-              name="description"
-              value={projectData.description}
-              onChange={handleChange}
+              {...register("description", { required: true })}
               className={`border ${
                 isDarkMode
                   ? "border-gray-700 bg-gray-800 text-white"
@@ -88,9 +82,7 @@ const EditProjectModal = ({
           <div className="mb-4">
             <label className="block font-medium mb-2">Assigned Manager</label>
             <select
-              name="assignedManager"
-              value={projectData.assignedManager}
-              onChange={handleChange}
+              {...register("assignedManager", { required: true })}
               className={`border ${
                 isDarkMode
                   ? "border-gray-700 bg-gray-800 text-white"
@@ -99,7 +91,7 @@ const EditProjectModal = ({
               required
             >
               <option value="">Select Manager</option>
-              {users.map((user) => (
+              {managerUsers.map((user) => (
                 <option key={user._id} value={user._id}>
                   {user.username}
                 </option>
@@ -110,9 +102,7 @@ const EditProjectModal = ({
             <label className="block font-medium mb-2">Due Date</label>
             <input
               type="date"
-              name="dueDate"
-              value={projectData.dueDate}
-              onChange={handleChange}
+              {...register("dueDate", { required: true })}
               className={`border ${
                 isDarkMode
                   ? "border-gray-700 bg-gray-800 text-white"
@@ -146,12 +136,6 @@ EditProjectModal.propTypes = {
   isDarkMode: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onEditProject: PropTypes.func.isRequired,
-  users: PropTypes.arrayOf(
-    PropTypes.shape({
-      _id: PropTypes.string.isRequired,
-      username: PropTypes.string.isRequired,
-    })
-  ).isRequired,
   project: PropTypes.shape({
     name: PropTypes.string,
     description: PropTypes.string,

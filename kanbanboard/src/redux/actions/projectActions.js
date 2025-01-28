@@ -1,0 +1,70 @@
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import axiosInstance from "../../utils/axiosInstance";
+
+export const fetchProjects = createAsyncThunk(
+    'projects/fetchProjects',
+    async (_, { rejectWithValue }) => {
+      try {
+        const token = localStorage.getItem('authToken');
+        const { data } = await axiosInstance.get('/projects', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        return data;
+      } catch (error) {
+        return rejectWithValue(error.response.data);
+      }
+    }
+  );
+
+export const addProject = createAsyncThunk(
+  "projects/addProject",
+  async (projectData, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("authToken");
+      const { data } = await axiosInstance.post("/projects", projectData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const editProject = createAsyncThunk(
+    'projects/editProject',
+    async ({ projectId, projectData }, { rejectWithValue }) => {
+      try {
+        const token = localStorage.getItem('authToken');
+        const { data } = await axiosInstance.put(`/projects/${projectId}`, projectData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        return data;
+      } catch (error) {
+        return rejectWithValue(error.response.data);
+      }
+    }
+  );
+
+  export const deleteProject = createAsyncThunk(
+    'projects/deleteProject',
+    async (projectId, { rejectWithValue }) => {
+      try {
+        const token = localStorage.getItem('authToken');
+        await axiosInstance.delete(`/projects/${projectId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        return projectId;
+      } catch (error) {
+        return rejectWithValue(error.response.data);
+      }
+    }
+  );

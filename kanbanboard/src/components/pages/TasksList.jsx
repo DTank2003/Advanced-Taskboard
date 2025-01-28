@@ -4,6 +4,7 @@ import { FaComment, FaListAlt, FaEdit, FaTrash } from "react-icons/fa";
 import ActivityLogModal from "./ActivityLogModal";
 import AddCommentModal from "./AddCommentModal";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const TasksList = ({
   columns,
@@ -35,7 +36,7 @@ const TasksList = ({
                   <div
                     {...provided.droppableProps}
                     ref={provided.innerRef}
-                    className={`p-4 rounded-lg shadow-md overflow-y-scroll w-full min-h-[450px] max-h-[450px] ${
+                    className={`p-4 rounded-lg shadow-md overflow-y-scroll w-full min-h-[540px] max-h-[540px] ${
                       darkMode ? "bg-gray-800 text-white" : "bg-white"
                     }`}
                   >
@@ -65,14 +66,14 @@ const TasksList = ({
                             {task.attachment && (
                               <p>
                                 Attachment:{" "}
-                                <a
-                                  href={`http://192.168.24.24:3005/uploads/${task.attachment}`}
+                                <Link
+                                  to={`http://192.168.24.24:3005/uploads/${task.attachment}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="text-blue-500 underline"
                                 >
                                   {task.attachment}
-                                </a>
+                                </Link>
                               </p>
                             )}
                             <p className="mt-2">
@@ -152,14 +153,14 @@ const TasksList = ({
       </DragDropContext>
       {showLogModal && (
         <ActivityLogModal
-          isDarkMode
+          isDarkMode={darkMode}
           taskId={taskId}
           onClose={() => setShowLogModal(false)}
         />
       )}
       {showCommentModal && (
         <AddCommentModal
-          isDarkMode
+          isDarkMode={darkMode}
           taskId={taskId}
           onClose={() => setShowCommentModal(false)}
         />

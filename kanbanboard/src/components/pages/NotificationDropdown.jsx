@@ -30,7 +30,7 @@ const NotificationDropdown = ({ onClose }) => {
   }, [dispatch, onClose]);
 
   const handleMarkAsRead = async (id) => {
-    await dispatch(markNotificationAsRead(id));
+    dispatch(markNotificationAsRead(id));
     dispatch(fetchNotifications());
   };
 
@@ -39,7 +39,7 @@ const NotificationDropdown = ({ onClose }) => {
       (notification) => !notification.read
     );
     for (const notification of unreadNotifications) {
-      await dispatch(markNotificationAsRead(notification._id));
+      dispatch(markNotificationAsRead(notification._id));
     }
   };
 

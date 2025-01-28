@@ -1,36 +1,29 @@
-import React, { useState } from "react";
 import PropTypes from "prop-types"; // Import PropTypes
+import { useDispatch, useSelector } from "react-redux";
+import { useForm } from "react-hook-form";
+import { addProject } from "../../redux/actions/projectActions";
+import { fetchUsers } from "../../redux/actions/userActions";
+import { useEffect } from "react";
 
-const AddProjectModal = ({ onClose, onAddProject, users, isDarkMode }) => {
-  console.log(`users are ${users}`);
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    teamMembers: [], // Array of user IDs
-    assignedManager: "",
-    dueDate: "",
-  });
+const AddProjectModal = ({ onClose, isDarkMode }) => {
+  const dispatch = useDispatch();
+  const { users, loading, error } = useSelector((state) => state.users);
+  const { register, handleSubmit, reset } = useForm();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  useEffect(() => {
+    dispatch(fetchUsers());
+  }, [dispatch]);
 
-  const handleSelectMembers = (e) => {
-    const selectedId = e.target.value;
-    setFormData({
-      ...formData,
-      teamMembers: [...formData.teamMembers, selectedId],
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(formData);
-    onAddProject(formData);
+  const onSubmit = (data) => {
+    dispatch(addProject(data));
+    reset();
+    onClose();
   };
 
   // Filter users to show only managers
-  const managerUsers = users.filter((user) => user.role === "manager");
+  const managerUsers = Array.isArray(users)
+    ? users.filter((user) => user.role === "manager")
+    : [];
 
   return (
     <div
@@ -44,45 +37,44 @@ const AddProjectModal = ({ onClose, onAddProject, users, isDarkMode }) => {
         } p-6 rounded-lg shadow-lg w-full max-w-md`}
       >
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Add New Project</h2>
+          <h2 className="text-2xl font-bold">Add Project</h2>
+          <button
+            onClick={onClose}
+            className={`${
+              isDarkMode ? "text-white" : "text-black"
+            } text-xl font-bold`}
+          >
+            &times;
+          </button>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block font-medium mb-2">Name</label>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="mb-4">
+            <label className="block mb-2">Project Name</label>
             <input
               type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className={`w-full px-4 py-2 border rounded-lg ${
-                isDarkMode ? "bg-gray-800 text-white" : "bg-white text-black"
+              {...register("name", { required: true })}
+              className={`w-full p-2 border rounded ${
+                isDarkMode ? "bg-gray-600 text-white" : "bg-gray-200 text-black"
               }`}
-              required
             />
           </div>
-          <div>
-            <label className="block font-medium mb-2">Description</label>
+          <div className="mb-4">
+            <label className="block mb-2">Description</label>
             <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              className={`w-full px-4 py-2 border rounded-lg ${
-                isDarkMode ? "bg-gray-800 text-white" : "bg-white text-black"
+              {...register("description", { required: true })}
+              className={`w-full p-2 border rounded ${
+                isDarkMode ? "bg-gray-600 text-white" : "bg-gray-200 text-black"
               }`}
-              required
             />
           </div>
-          <div>
-            <label className="block font-medium mb-2">Assigned Manager</label>
+          <div className="mb-4">
+            <label className="block mb-2">Assigned Manager</label>
             <select
-              name="assignedManager"
-              value={formData.assignedManager}
-              onChange={handleChange}
-              className={`w-full px-4 py-2 border rounded-lg ${
-                isDarkMode ? "bg-gray-800 text-white" : "bg-white text-black"
+              {...register("managerId", { required: true })}
+              className={`w-full p-2 border rounded ${
+                isDarkMode ? "bg-gray-600 text-white" : "bg-gray-200 text-black"
               }`}
             >
-              <option value="">Select Manager</option>
               {managerUsers.map((user) => (
                 <option key={user._id} value={user._id}>
                   {user.username}
@@ -90,50 +82,39 @@ const AddProjectModal = ({ onClose, onAddProject, users, isDarkMode }) => {
               ))}
             </select>
           </div>
-          <div>
-            <label className="block font-medium mb-2">Due date</label>
+          <div className="mb-4">
+            <label className="block mb-2">Due Date</label>
             <input
               type="date"
-              name="dueDate"
-              placeholder="Due Date"
-              value={formData.dueDate}
-              onChange={handleChange}
-              className={`w-full px-4 py-2 border rounded-lg ${
-                isDarkMode ? "bg-gray-800 text-white" : "bg-white text-black"
+              {...register("dueDate", { required: true })}
+              className={`w-full p-2 border rounded ${
+                isDarkMode ? "bg-gray-600 text-white" : "bg-gray-200 text-black"
               }`}
             />
           </div>
-          <div className="flex justify-end space-x-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className={`px-4 py-2 rounded-lg ${
-                isDarkMode
-                  ? "bg-gray-600 text-white"
-                  : "bg-gray-200 text-gray-800"
-              }`}
-            >
-              Cancel
-            </button>
+          <div className="flex justify-end">
             <button
               type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+              className={`px-4 py-2 rounded ${
+                isDarkMode
+                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                  : "bg-blue-500 text-white hover:bg-blue-600"
+              }`}
+              disabled={loading}
             >
-              Add Project
+              {loading ? "Adding..." : "Add Project"}
             </button>
           </div>
         </form>
+        {error && <p className="text-red-500 mt-4">{error}</p>}
       </div>
     </div>
   );
 };
 
-// Adding PropTypes for validation
 AddProjectModal.propTypes = {
   isDarkMode: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired, // onClose is a required function
-  onAddProject: PropTypes.func.isRequired, // onAddProject is a required function
-  users: PropTypes.array.isRequired, // users is a required array of user objects
+  onClose: PropTypes.func.isRequired,
 };
 
 export default AddProjectModal;

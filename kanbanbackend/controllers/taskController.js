@@ -75,8 +75,6 @@ const createTask = async (req, res) => {
 
     const maxOrder = await Task.findOne({ status, projectId }).sort({ order: -1 }).exec();
     const newOrder = maxOrder ? maxOrder.order + 1: 1;
-    console.log(`max order is ${maxOrder}`);
-      console.log(`new order is ${newOrder}`);
     
       const newTask = new Task({
       title,
@@ -96,7 +94,7 @@ const createTask = async (req, res) => {
 
     await newTask.save();
     const user = await User.findById({_id: req.user._id});
-    console.log(user);
+   
     await notifyTaskUpdate(newTask, `New task created by ${user.username}`);
     res.status(201).json(newTask);
   } catch (error) {
@@ -105,10 +103,10 @@ const createTask = async (req, res) => {
 };
 
 const getTasksAssigned = async (req, res) => {
-  console.log("Reached controller");
+  
   try {
     const userId = req.user._id; // Assuming the user's ID is available in req.user
-    console.log(userId);
+    
     const tasks = await Task.find({ assignedTo: userId }).populate("projectId");
     res.status(200).json(tasks);
   } catch (error) {
@@ -154,7 +152,7 @@ const getTaskByProjectId = async (req, res) => {
 
 const reorderTasks = async (req, res) => {
   const {updatedTask, tasks, status} = req.body;
-  console.log("reorderTasks called");
+  
   try {
     const bulkOps = tasks.map((task) => ({
       updateOne: {
@@ -170,7 +168,7 @@ const reorderTasks = async (req, res) => {
         userId: req.user._id,
         action: "Task reordered",
       });
-      console.log("activitylog entry done heree");
+      
     } catch (error) {
       console.log("error logging", error);
     }
@@ -204,7 +202,6 @@ const updateTask = async (req, res) => {
         userId: req.user._id,
         action: "Task Updated",
       });
-      console.log("activitylog entry done yaha");
     } catch (error) {
       console.log("error logging", error);
     }

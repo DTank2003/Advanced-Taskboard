@@ -3,7 +3,6 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/userModel");
 
 const generateToken = (id) => {
-  console.log(`id is ${id}`);
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: "30d",
   });
@@ -66,9 +65,8 @@ exports.getMe = async (req, res) => {
       return res.status(401).json({ message: "No req.user" });
     }
     const userId = req.user.id;
-    console.log(userId);
     const user = await User.findById(userId).select("-password");
-    console.log(user);
+    
     res.status(200).json(user);
   } catch (error) {
     res.status(500).json({ message: error.message });

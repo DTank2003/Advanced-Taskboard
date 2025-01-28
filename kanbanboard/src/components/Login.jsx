@@ -2,13 +2,12 @@ import InputField from "./InputField";
 import Button from "./Button";
 import { useState } from "react";
 import axiosInstance from "../utils/axiosInstance";
-import PropTypes from "prop-types";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { fetchNotifications } from "../redux/actions/notificationActions";
 import { useDispatch } from "react-redux";
 import { loginSchema } from "../utils/validationSchemas";
 
-const Login = ({ setAuthToken }) => {
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -35,23 +34,17 @@ const Login = ({ setAuthToken }) => {
       const { token } = response.data;
 
       localStorage.setItem("authToken", token);
-      localStorage.setItem("userRole", response.data.role);
-      console.log("here here here");
       if (response.data.role === "user") {
         dispatch(fetchNotifications(response.data._id));
       }
 
       if (response.data.role === "admin") {
-        console.log("admin it is");
         navigate("/admin/dashboard");
       } else if (response.data.role === "manager") {
-        console.log("manager it is");
         navigate("/manager/dashboard");
       } else if (response.data.role === "user") {
-        console.log("user it is");
         navigate("/user/dashboard");
       }
-      console.log("check done");
 
       alert("Login successful!");
     } catch (err) {
@@ -91,18 +84,14 @@ const Login = ({ setAuthToken }) => {
         </form>
         {error && <p className="text-red-500 text-center mt-4">{error}</p>}
         <p className="text-center text-gray-600 mt-4">
-          Don't have an account?{" "}
-          <a href="/signup" className="text-blue-500 hover:underline">
+          Donot have an account?{" "}
+          <Link to="/signup" className="text-blue-500 hover:underline">
             Signup
-          </a>
+          </Link>
         </p>
       </div>
     </div>
   );
-};
-
-Login.propTypes = {
-  setAuthToken: PropTypes.func.isRequired,
 };
 
 export default Login;

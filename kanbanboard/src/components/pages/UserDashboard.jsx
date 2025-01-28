@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import axiosInstance from "../../utils/axiosInstance";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   FaComment,
   FaListAlt,
@@ -43,9 +43,10 @@ const UserDashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  if (!localStorage.getItem("authToken")) {
+  const token = localStorage.getItem("authToken");
+  if (!token) {
     console.error("User is not authenticated.");
-    location.href = "/";
+    navigate("/");
   }
 
   useEffect(() => {
@@ -72,7 +73,6 @@ const UserDashboard = () => {
   };
 
   const fetchTasks = async () => {
-    console.log("Fetching tasks...");
     try {
       const token = localStorage.getItem("authToken");
       const { data } = await axiosInstance.get("/tasks/user-tasks", {
@@ -238,6 +238,7 @@ const UserDashboard = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
+    localStorage.clear();
     navigate("/");
   };
 
@@ -368,14 +369,14 @@ const UserDashboard = () => {
                               {task.attachment && (
                                 <p>
                                   Attachment:{" "}
-                                  <a
-                                    href={`http://192.168.24.24:3005/uploads/${task.attachment}`}
+                                  <Link
+                                    to={`http://192.168.24.24:3005/uploads/${task.attachment}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="text-blue-500 underline"
                                   >
                                     {task.attachment}
-                                  </a>
+                                  </Link>
                                 </p>
                               )}
                               <p className="mt-2">

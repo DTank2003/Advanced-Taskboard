@@ -36,12 +36,11 @@ const ProjectTasks = () => {
 
   if (!localStorage.getItem("authToken")) {
     console.error("User is not authenticated.");
-    location.href = "/";
+    navigate("/");
   }
 
   const handleFileChange = (e) => {
     e.preventDefault();
-    console.log(e.target.files[0]);
     setNewTask({ ...newTask, attachment: e.target.files[0] });
   };
 
@@ -68,7 +67,6 @@ const ProjectTasks = () => {
   };
 
   const fetchTasks = async () => {
-    console.log("Fetching tasks...");
     try {
       const token = localStorage.getItem("authToken");
       const { data } = await axiosInstance.get(`/tasks/project/${projectId}`, {
@@ -251,6 +249,7 @@ const ProjectTasks = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
+    localStorage.clear();
     navigate("/");
   };
 
@@ -346,7 +345,7 @@ const ProjectTasks = () => {
 
   const [analyticsData, setAnalyticsData] = useState(null);
   const [showAnalyticsModal, setShowAnalyticsModal] = useState(false);
-  const [selectedProjectId, setSelectedProjectId] = useState(null);
+  //const [selectedProjectId, setSelectedProjectId] = useState(null);
 
   const handleAnalyticsClick = async (projectId) => {
     try {
@@ -360,7 +359,7 @@ const ProjectTasks = () => {
         }
       );
       setAnalyticsData(data);
-      setSelectedProjectId(projectId);
+      //setSelectedProjectId(projectId);
       setShowAnalyticsModal(true);
     } catch (error) {
       console.error("Error fetching analytics:", error.message);
@@ -369,7 +368,7 @@ const ProjectTasks = () => {
 
   const closeAnalyticsModal = () => {
     setShowAnalyticsModal(false);
-    setSelectedProjectId(null);
+    //setSelectedProjectId(null);
   };
 
   const isDueDatePassed = (dueDate) => {
@@ -487,6 +486,7 @@ const ProjectTasks = () => {
       {showAnalyticsModal && (
         <AnalyticsModal
           isOpen={showAnalyticsModal}
+          darkMode={darkMode}
           onClose={closeAnalyticsModal}
           analyticsData={analyticsData}
         />
