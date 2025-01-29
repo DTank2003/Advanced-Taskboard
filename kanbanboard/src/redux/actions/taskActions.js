@@ -1,4 +1,4 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
+import { createAction, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../utils/axiosInstance";
 
 export const fetchTasks = createAsyncThunk(
@@ -70,22 +70,43 @@ export const updateTask = createAsyncThunk(
   }
 );
 
+export const fetchTasksByProject = createAsyncThunk(
+  'projects/fetchTaskByProject',
+  async(projectId, {rejectWithValue}) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      const {data} = await axiosInstance.get(`tasks/project/${projectId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return data;
+    } catch(error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+)
+
 export const deleteTask = createAsyncThunk(
   "tasks/deleteTask",
   async (taskId, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("authToken");
-      await axiosInstance.delete(`/tasks/${taskId}`, {
+      const {data} = await axiosInstance.delete(`/tasks/${taskId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      return taskId;
+      return {data, taskId};
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
   }
 );
+
+export const setTasks = createAction("tasks/setTasks");
 
 export const reorderTasks = createAsyncThunk(
   "tasks/reorderTasks",
@@ -101,8 +122,9 @@ export const reorderTasks = createAsyncThunk(
           },
         }
       );
-      await dispatchEvent(fetchTasksForUser());
-      return { updatedTask, tasks, status };
+      const taskks = tasks;
+      //await dispatchEvent(fetchTasksForUser());
+      return { updatedTask, taskks, status };
     } catch (error) {
       return rejectWithValue(error.response.data);
     }

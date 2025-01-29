@@ -109,6 +109,9 @@ const updateProject = async (req, res) => {
 const deleteProject = async (req, res) => {
     try {
         const deletedProject = await Project.findByIdAndDelete(req.params.id);
+        
+        await Task.deleteMany({projectId: req.params.id});
+        
         if (deletedProject) {
             res.status(200).json({ message: 'Project deleted' });
         } else {

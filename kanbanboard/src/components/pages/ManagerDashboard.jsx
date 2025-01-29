@@ -60,31 +60,33 @@ const ManagerDashboard = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (tasks.length > 0) {
-      setDependencyOptions(tasks);
+    if (tasks) {
+      if (tasks.length > 0) {
+        setDependencyOptions(tasks);
 
-      const groupedTasks = {
-        todo: {
-          name: "To Do",
-          items: tasks
-            .filter((task) => task.status === "todo")
-            .sort((a, b) => a.order - b.order),
-        },
-        inprogress: {
-          name: "In Progress",
-          items: tasks
-            .filter((task) => task.status === "inprogress")
-            .sort((a, b) => a.order - b.order),
-        },
-        done: {
-          name: "Done",
-          items: tasks
-            .filter((task) => task.status === "done")
-            .sort((a, b) => a.order - b.order),
-        },
-      };
+        const groupedTasks = {
+          todo: {
+            name: "To Do",
+            items: tasks
+              .filter((task) => task.status === "todo")
+              .sort((a, b) => a.order - b.order),
+          },
+          inprogress: {
+            name: "In Progress",
+            items: tasks
+              .filter((task) => task.status === "inprogress")
+              .sort((a, b) => a.order - b.order),
+          },
+          done: {
+            name: "Done",
+            items: tasks
+              .filter((task) => task.status === "done")
+              .sort((a, b) => a.order - b.order),
+          },
+        };
 
-      setColumns(groupedTasks);
+        setColumns(groupedTasks);
+      }
     }
   }, [tasks]);
 
@@ -179,8 +181,6 @@ const ManagerDashboard = () => {
         status: destination.droppableId,
       })
     );
-
-    //dispatch(fetchTasks());
   };
 
   const getPriorityColor = (priority) => {

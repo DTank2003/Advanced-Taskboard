@@ -147,7 +147,6 @@ const getTaskByProjectId = async (req, res) => {
 
 const reorderTasks = async (req, res) => {
   const {updatedTask, tasks, status} = req.body;
-  
   try {
     const bulkOps = tasks.map((task) => ({
       updateOne: {
@@ -180,7 +179,8 @@ const reorderTasks = async (req, res) => {
       await notifyTaskUpdate(updatedTask, `Task updated by ${user.username}`);
     }
 
-    res.status(200).json({message: 'Tasks reordered successfully'});
+    res.status(200).json(tasks);
+    //res.status(200).json({message: 'Tasks reordered successfully'});
   } catch(error) {
     res.status(500).json({error: "Error reordering tasks"});
   }
@@ -214,7 +214,10 @@ const updateTask = async (req, res) => {
     }
     
     if (updatedTask) {
-      res.status(200).json(updatedTask);
+      // Fetch the updated list of tasks
+      const updatedTasks = await Task.find({ projectId: updatedTask.projectId });
+
+      res.status(200).json(updatedTasks);
     } else {
       res.status(404).json({ message: "Task not found" });
     }
@@ -244,7 +247,8 @@ const deleteTask = async (req, res) => {
         userId: req.user._id,
         action: "Task Deleted",
       });
-      //remove task from associated project
+
+      // Remove task from associated project
       const projectObj = await Project.findById(deletedTask.projectId);
       if (projectObj) {
         projectObj.tasks = projectObj.tasks.filter(
@@ -252,7 +256,17 @@ const deleteTask = async (req, res) => {
         );
         await projectObj.save();
       }
-      res.status(200).json({ message: "Task deleted" });
+
+      // Remove the deleted task from dependencies of other tasks
+      await Task.updateMany(
+        { dependencies: req.params.id },
+        { $pull: { dependencies: req.params.id } }
+      );
+      
+      // Fetch the updated list of tasks
+      const updatedTasks = await Task.find({ projectId: deletedTask.projectId });
+
+      res.status(200).json(updatedTasks);
     } else {
       res.status(404).json({ message: "Task not found" });
     }

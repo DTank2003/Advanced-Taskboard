@@ -14,17 +14,16 @@ import {
   updateTask,
 } from "../../redux/actions/taskActions";
 import { useForm } from "react-hook-form";
-import {
-  fetchProjectAnalytics,
-  fetchTasksByProject,
-} from "../../redux/actions/projectActions";
+import { fetchProjectAnalytics } from "../../redux/actions/projectActions";
+import { fetchTasksByProject } from "../../redux/actions/taskActions";
+import { getTitle } from "../../constants/constants";
 
 const ProjectTasks = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { projectId } = useParams();
   const [projectid, setProjectid] = useState(projectId);
-  const { tasks } = useSelector((state) => state.projects);
+  const { tasks } = useSelector((state) => state.tasks);
   const { users } = useSelector((state) => state.users);
   const { reset, setValue } = useForm();
   const { analyticsData } = useSelector((state) => state.projects);
@@ -61,16 +60,16 @@ const ProjectTasks = () => {
   };
 
   useEffect(() => {
+    dispatch(fetchTasksByProject(projectid));
     dispatch(fetchUsers());
     dispatch(fetchUsername());
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(fetchTasksByProject(projectid));
-  }, [dispatch, projectid]);
-
-  useEffect(() => {
-    if (tasks.length > 0) {
+    console.log(tasks);
+    console.log("called called called");
+    if (tasks) {
+      console.log(tasks.length);
       setDependencyOptions(tasks);
 
       const groupedTasks = {
@@ -258,7 +257,9 @@ const ProjectTasks = () => {
           darkMode ? "bg-gray-800" : "bg-blue-600"
         }`}
       >
-        <h1 className="text-2xl font-bold tracking-wide">Admin Dashboard</h1>
+        <h1 className="text-2xl font-bold tracking-wide">
+          {getTitle("ADMIN_DASHBOARD")}
+        </h1>
         <div className="flex space-x-4 items-center">
           <input
             type="text"
@@ -280,10 +281,10 @@ const ProjectTasks = () => {
                 : "border-gray-300 text-black"
             }`}
           >
-            <option value="">All</option>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
+            <option value="">{getTitle("ALL")}</option>
+            <option value="low">{getTitle("LOW")}</option>
+            <option value="medium">{getTitle("MEDIUM")}</option>
+            <option value="high">{getTitle("HIGH")}</option>
           </select>
 
           <button
