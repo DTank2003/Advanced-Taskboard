@@ -5,6 +5,7 @@ import ActivityLogModal from "./ActivityLogModal";
 import AddCommentModal from "./AddCommentModal";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { getTitle } from "../../constants/constants";
 
 const TasksList = ({
   columns,
@@ -25,7 +26,7 @@ const TasksList = ({
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Assigned Tasks</h2>
+      <h2 className="text-2xl font-bold mb-4">{getTitle("ASSIGNED_TASKS")}</h2>
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="flex space-x-4">
           {Object.entries(columns).map(([columnId, column]) => (
@@ -61,11 +62,11 @@ const TasksList = ({
                               {task.title}
                             </h3>
                             <p className="mt-2">
-                              Description: {task.description}
+                              {getTitle("DESCRIPTION")} {task.description}
                             </p>
                             {task.attachment && (
                               <p>
-                                Attachment:{" "}
+                                {getTitle("ATTACHMENT")}
                                 <Link
                                   to={`http://192.168.24.24:3005/uploads/${task.attachment}`}
                                   target="_blank"
@@ -77,13 +78,13 @@ const TasksList = ({
                               </p>
                             )}
                             <p className="mt-2">
-                              Due Date:{" "}
+                              {getTitle("DUE_DATE")}
                               {task.dueDate
                                 ? new Date(task.dueDate).toLocaleDateString()
                                 : "---"}
                             </p>
                             <p className="mt-2">
-                              Priority:{" "}
+                              {getTitle("PRIORITY")}
                               <span
                                 className={`inline-block px-2 py-1 text-white text-sm rounded ${getPriorityColor(
                                   task.priority
@@ -94,13 +95,13 @@ const TasksList = ({
                             </p>
                             {task.dueDate && isDueDatePassed(task.dueDate) && (
                               <p className="text-red-500 mt-2">
-                                Due date has passed!
+                                {getTitle("DUE_DATE_ALERT")}
                               </p>
                             )}
                             {task.dependencies &&
                               task.dependencies.length > 0 && (
                                 <div className="mt-2">
-                                  <strong>Dependencies: </strong>
+                                  <strong>{getTitle("DEPENDENCIES")}</strong>
                                   <ul>
                                     {task.dependencies.map((depId) => {
                                       const depTask = dependencyOptions.find(

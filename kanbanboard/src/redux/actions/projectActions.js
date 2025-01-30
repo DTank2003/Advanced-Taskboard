@@ -91,7 +91,6 @@ export const fetchTasksByProject = createAsyncThunk(
   export const fetchManagerProject = createAsyncThunk(
     'projects/fetchManagerProject',
     async (_, { rejectWithValue }) => {
-      console.log(`called`);
       try {
         const token = localStorage.getItem('authToken');
         const { data } = await axiosInstance.get('/projects/manager', {

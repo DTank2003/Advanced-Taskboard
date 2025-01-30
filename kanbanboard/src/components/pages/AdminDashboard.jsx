@@ -11,6 +11,7 @@ import {
   fetchProjects,
 } from "../../redux/actions/projectActions";
 import { fetchUsers } from "../../redux/actions/userActions";
+import { getTitle } from "../../constants/constants";
 
 const AdminDashboard = () => {
   //const [projects, setProjects] = useState([]);
@@ -80,7 +81,7 @@ const AdminDashboard = () => {
           darkMode ? "bg-gray-800 text-white" : "bg-blue-600 text-white"
         }`}
       >
-        <h1 className="text-xl font-bold">Admin Dashboard</h1>
+        <h1 className="text-xl font-bold">{getTitle("ADMIN_DASHBOARD")}</h1>
         <div className="flex space-x-4">
           <button
             onClick={() => {
@@ -93,7 +94,7 @@ const AdminDashboard = () => {
                 : "bg-white text-blue-600 hover:bg-gray-200"
             }`}
           >
-            Add New Project
+            {getTitle("ADD_NEW_PROJECT")}
           </button>
           <button
             onClick={handleLogout}
@@ -103,7 +104,7 @@ const AdminDashboard = () => {
                 : "bg-white text-blue-600 hover:bg-gray-200"
             }`}
           >
-            Logout
+            {getTitle("LOGOUT")}
           </button>
           <button
             onClick={toggleDarkMode}
@@ -120,11 +121,13 @@ const AdminDashboard = () => {
 
       {/* Project List */}
       <div className="p-6">
-        <h2 className="text-2xl font-bold mb-4">Projects</h2>
+        <h2 className="text-2xl font-bold mb-4">{getTitle("PROJECTS")}</h2>
         {loading ? (
-          <p>Loading...</p>
+          <p>{getTitle("LOADING")}</p>
         ) : error ? (
-          <p className="text-red-500">Error: {error}</p>
+          <p className="text-red-500">
+            {getTitle("ERROR")} {error}
+          </p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {projects.map((project) => (
@@ -142,15 +145,17 @@ const AdminDashboard = () => {
                     className="cursor-pointer"
                   >
                     <h3 className="text-xl font-semibold">{project.name}</h3>
-                    <p className="mt-2">Description: {project.description}</p>
                     <p className="mt-2">
-                      Assigned Manager:{" "}
+                      {getTitle("DESCRIPTION")} {project.description}
+                    </p>
+                    <p className="mt-2">
+                      {getTitle("ASSIGNED_MANAGER")}
                       {project.assignedManager
                         ? project.assignedManager.username
                         : "Nil"}
                     </p>
                     <p className="mt-2">
-                      Due Date:{" "}
+                      {getTitle("DUE_DATE")}
                       {project.dueDate
                         ? new Date(project.dueDate).toLocaleDateString()
                         : " Nil"}

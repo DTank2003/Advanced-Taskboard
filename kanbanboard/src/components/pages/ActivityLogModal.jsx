@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchActivityLogs } from "../../redux/actions/activityLogActions";
+import { getTitle } from "../../constants/constants";
 
 const ActivityLogModal = ({ taskId, onClose, isDarkMode }) => {
   const dispatch = useDispatch();
@@ -22,12 +23,16 @@ const ActivityLogModal = ({ taskId, onClose, isDarkMode }) => {
           isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-800"
         }`}
       >
-        <h2 className="text-2xl font-bold mb-4 border-b pb-2">Activity Log</h2>
+        <h2 className="text-2xl font-bold mb-4 border-b pb-2">
+          {getTitle("ACTIVITY_LOG")}
+        </h2>
         <div className="h-64 overflow-y-auto mb-4">
           {loading ? (
-            <p>Loading...</p>
+            <p>{getTitle("LOADING")}</p>
           ) : error ? (
-            <p className="text-red-500">Error: {error}</p>
+            <p className="text-red-500">
+              {getTitle("ERROR")} {error}
+            </p>
           ) : logs.length > 0 ? (
             logs.map((log) => (
               <div key={log._id} className="border-b pb-2 mb-2">
@@ -36,7 +41,8 @@ const ActivityLogModal = ({ taskId, onClose, isDarkMode }) => {
                     isDarkMode ? "text-gray-300" : "text-gray-800"
                   }`}
                 >
-                  <strong>{log.userId.username}</strong> performed: {log.action}
+                  <strong>{log.userId.username}</strong> {getTitle("PERFORMED")}
+                  {log.action}
                 </p>
                 <p
                   className={`text-sm ${
@@ -49,7 +55,7 @@ const ActivityLogModal = ({ taskId, onClose, isDarkMode }) => {
             ))
           ) : (
             <p className={`${isDarkMode ? "text-gray-500" : "text-gray-500"}`}>
-              No activity logs yet.
+              {getTitle("NO_ACTIVITY_LOGS")}
             </p>
           )}
         </div>
@@ -61,7 +67,7 @@ const ActivityLogModal = ({ taskId, onClose, isDarkMode }) => {
               : "bg-gray-200 hover:bg-gray-300 text-gray-800"
           }`}
         >
-          Close
+          {getTitle("CLOSE")}
         </button>
       </div>
     </div>

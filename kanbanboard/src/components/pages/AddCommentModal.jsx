@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchComments, addComment } from "../../redux/actions/commentActions";
+import { getTitle } from "../../constants/constants";
 
 const AddCommentModal = ({ taskId, onClose, isDarkMode }) => {
   const [newComment, setNewComment] = useState("");
@@ -31,13 +32,17 @@ const AddCommentModal = ({ taskId, onClose, isDarkMode }) => {
           isDarkMode ? "bg-gray-800 text-white" : "bg-white text-black"
         } w-full max-w-lg p-6 rounded-lg shadow-2xl transform transition-all duration-300 ease-in-out`}
       >
-        <h2 className="text-2xl font-bold mb-4 border-b pb-2">Comments</h2>
+        <h2 className="text-2xl font-bold mb-4 border-b pb-2">
+          {getTitle("COMMENTS")}
+        </h2>
 
         <div className="h-64 overflow-y-auto mb-4 space-y-4">
           {loading ? (
-            <p>Loading...</p>
+            <p>{getTitle("LOADING")}</p>
           ) : error ? (
-            <p className="text-red-500">Error: {error}</p>
+            <p className="text-red-500">
+              {getTitle("ERROR")} {error}
+            </p>
           ) : comments.length > 0 ? (
             comments.map((comment) => (
               <div key={comment._id} className="border-b pb-2 mb-2">
@@ -55,7 +60,7 @@ const AddCommentModal = ({ taskId, onClose, isDarkMode }) => {
               </div>
             ))
           ) : (
-            <p className="text-gray-500">No comments yet.</p>
+            <p className="text-gray-500">{getTitle("NO_COMMENTS")}</p>
           )}
         </div>
 
@@ -89,7 +94,7 @@ const AddCommentModal = ({ taskId, onClose, isDarkMode }) => {
               : "bg-gray-200 text-black"
           }`}
         >
-          Close
+          {getTitle("CLOSE")}
         </button>
       </div>
     </div>

@@ -6,6 +6,7 @@ import {
   markNotificationAsRead,
 } from "../../redux/actions/notificationActions";
 import PropTypes from "prop-types";
+import { getTitle } from "../../constants/constants";
 
 const NotificationDropdown = ({ onClose }) => {
   const dispatch = useDispatch();
@@ -53,17 +54,21 @@ const NotificationDropdown = ({ onClose }) => {
       // Ensure the dropdown appears below the navbar
     >
       <div className="flex justify-between px-4 py-2 border-b bg-gray-100">
-        <span className="font-medium text-gray-700">Notifications</span>
+        <span className="font-medium text-gray-700">
+          {getTitle("NOTIFICATIONS")}
+        </span>
         <button
           onClick={handleMarkAllRead}
           className="text-sm text-blue-600 hover:underline"
         >
-          Mark All as Read
+          {getTitle("MARK_ALL_READ")}
         </button>
       </div>
       <ul className="max-h-64 overflow-y-auto">
         {notifications.length === 0 ? (
-          <li className="p-4 text-gray-500 text-center">No notifications</li>
+          <li className="p-4 text-gray-500 text-center">
+            {getTitle("NO_NOTIFICATIONS")}
+          </li>
         ) : (
           notifications.map((notification) => (
             <li
@@ -79,7 +84,7 @@ const NotificationDropdown = ({ onClose }) => {
                     onClick={() => handleMarkAsRead(notification._id)}
                     className="text-sm text-blue-600 hover:underline"
                   >
-                    Mark as Read
+                    {getTitle("MARK_READ")}
                   </button>
                 )}
               </div>

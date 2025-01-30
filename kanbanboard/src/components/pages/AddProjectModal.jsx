@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { addProject } from "../../redux/actions/projectActions";
 import { fetchUsers } from "../../redux/actions/userActions";
 import { useEffect } from "react";
+import { getTitle } from "../../constants/constants";
 
 const AddProjectModal = ({ onClose, isDarkMode }) => {
   const dispatch = useDispatch();
@@ -37,7 +38,7 @@ const AddProjectModal = ({ onClose, isDarkMode }) => {
         } p-6 rounded-lg shadow-lg w-full max-w-md`}
       >
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">Add Project</h2>
+          <h2 className="text-2xl font-bold">{getTitle("ADD_PROJECT")}</h2>
           <button
             onClick={onClose}
             className={`${
@@ -49,7 +50,7 @@ const AddProjectModal = ({ onClose, isDarkMode }) => {
         </div>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
-            <label className="block mb-2">Project Name</label>
+            <label className="block mb-2">{getTitle("PROJECT_NAME")}</label>
             <input
               type="text"
               {...register("name", { required: true })}
@@ -59,7 +60,7 @@ const AddProjectModal = ({ onClose, isDarkMode }) => {
             />
           </div>
           <div className="mb-4">
-            <label className="block mb-2">Description</label>
+            <label className="block mb-2">{getTitle("DESCRIPTION")}</label>
             <textarea
               {...register("description", { required: true })}
               className={`w-full p-2 border rounded ${
@@ -68,7 +69,7 @@ const AddProjectModal = ({ onClose, isDarkMode }) => {
             />
           </div>
           <div className="mb-4">
-            <label className="block mb-2">Assigned Manager</label>
+            <label className="block mb-2">{getTitle("ASSIGNED_MANAGER")}</label>
             <select
               {...register("managerId", { required: true })}
               className={`w-full p-2 border rounded ${
@@ -83,7 +84,7 @@ const AddProjectModal = ({ onClose, isDarkMode }) => {
             </select>
           </div>
           <div className="mb-4">
-            <label className="block mb-2">Due Date</label>
+            <label className="block mb-2">{getTitle("DUE_DATE")}</label>
             <input
               type="date"
               {...register("dueDate", { required: true })}

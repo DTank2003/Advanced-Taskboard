@@ -15,6 +15,7 @@ import {
 } from "../../redux/actions/taskActions";
 import { fetchUsername, fetchUsers } from "../../redux/actions/userActions";
 import { fetchManagerProject } from "../../redux/actions/projectActions";
+import { getTitle } from "../../constants/constants";
 
 const ManagerDashboard = () => {
   const dispatch = useDispatch();
@@ -261,8 +262,12 @@ const ManagerDashboard = () => {
       />
 
       {/* Loading and Error Messages */}
-      {loading && <p>Loading...</p>}
-      {error && <p className="text-red-500">Error: {error}</p>}
+      {loading && <p>{getTitle("LOADING")}</p>}
+      {error && (
+        <p className="text-red-500">
+          {getTitle("ERROR")} {error}
+        </p>
+      )}
 
       {/* Add Task Modal */}
       <AddTaskModal

@@ -19,6 +19,7 @@ import {
   reorderTasks,
 } from "../../redux/actions/taskActions";
 import { fetchUsername } from "../../redux/actions/userActions";
+import { getTitle } from "../../constants/constants";
 
 const UserDashboard = () => {
   const dispatch = useDispatch();
@@ -212,7 +213,9 @@ const UserDashboard = () => {
           darkMode ? "bg-gray-800" : "bg-blue-600"
         }`}
       >
-        <h1 className="text-2xl font-bold tracking-wide">User Dashboard</h1>
+        <h1 className="text-2xl font-bold tracking-wide">
+          {getTitle("USER_DASHBOARD")}
+        </h1>
         <div className="flex space-x-4 items-center">
           <input
             type="text"
@@ -234,10 +237,10 @@ const UserDashboard = () => {
                 : "border-gray-300 text-black"
             }`}
           >
-            <option value="">All</option>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
+            <option value="">{getTitle("ALL")}</option>
+            <option value="low">{getTitle("LOW")}</option>
+            <option value="medium">{getTitle("MEDIUM")}</option>
+            <option value="high">{getTitle("HIGH")}</option>
           </select>
 
           {/* Notification Icon */}
@@ -269,7 +272,7 @@ const UserDashboard = () => {
             {isUserDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-10">
                 <p className="px-4 py-2 text-gray-700">
-                  Logged in as:{" "}
+                  {getTitle("LOGGED_IN_AS")}
                   <span className="font-semibold">{currentUsername}</span>
                 </p>
                 <hr className="border-t border-gray-300 my-2" />
@@ -277,7 +280,7 @@ const UserDashboard = () => {
                   onClick={handleLogout}
                   className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
                 >
-                  Logout
+                  {getTitle("LOGOUT")}
                 </button>
               </div>
             )}
@@ -287,7 +290,9 @@ const UserDashboard = () => {
 
       {/* Tasks List */}
       <div className="p-6">
-        <h2 className="text-2xl font-bold mb-4">Assigned Tasks</h2>
+        <h2 className="text-2xl font-bold mb-4">
+          {getTitle("ASSIGNED_TASKS")}
+        </h2>
         <DragDropContext onDragEnd={onDragEnd}>
           <div className="flex space-x-4">
             {Object.entries(columns).map(([columnId, column]) => (
@@ -323,11 +328,11 @@ const UserDashboard = () => {
                                 {task.title}
                               </h3>
                               <p className="mt-2">
-                                Description: {task.description}
+                                {getTitle("DESCRIPTION")} {task.description}
                               </p>
                               {task.attachment && (
                                 <p>
-                                  Attachment:{" "}
+                                  {getTitle("ATTACHMENT")}
                                   <Link
                                     to={`http://192.168.24.24:3005/uploads/${task.attachment}`}
                                     target="_blank"
@@ -339,13 +344,13 @@ const UserDashboard = () => {
                                 </p>
                               )}
                               <p className="mt-2">
-                                Due Date:{" "}
+                                {getTitle("DUE_DATE")}
                                 {task.dueDate
                                   ? new Date(task.dueDate).toLocaleDateString()
                                   : "---"}
                               </p>
                               <p className="mt-2">
-                                Priority:{" "}
+                                {getTitle("PRIORITY")}
                                 <span
                                   className={`inline-block px-2 py-1 text-white text-sm rounded ${getPriorityColor(
                                     task.priority
@@ -357,13 +362,13 @@ const UserDashboard = () => {
                               {task.dueDate &&
                                 isDueDatePassed(task.dueDate) && (
                                   <p className="text-red-500 mt-2">
-                                    Due date has passed!
+                                    {getTitle("DUE_DATE_ALERT")}
                                   </p>
                                 )}
                               {task.dependencies &&
                                 task.dependencies.length > 0 && (
                                   <div className="mt-2">
-                                    <strong>Dependencies: </strong>
+                                    <strong>{getTitle("DEPENDENCIES")} </strong>
                                     <ul>
                                       {task.dependencies.map((depId) => {
                                         const depTask = dependencyOptions.find(

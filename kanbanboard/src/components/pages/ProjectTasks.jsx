@@ -66,10 +66,7 @@ const ProjectTasks = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    console.log(tasks);
-    console.log("called called called");
     if (tasks) {
-      console.log(tasks.length);
       setDependencyOptions(tasks);
 
       const groupedTasks = {
@@ -291,7 +288,7 @@ const ProjectTasks = () => {
             onClick={() => setShowAddTaskModal(true)}
             className="bg-white text-blue-600 px-4 py-2 rounded-lg shadow hover:bg-gray-200 transition duration-300 ease-in-out transform hover:scale-105"
           >
-            Add Task
+            {getTitle("ADD_TASK")}
           </button>
           {/* Dark Mode Toggle */}
           <button
@@ -310,14 +307,14 @@ const ProjectTasks = () => {
             {isUserDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-10">
                 <p className="px-4 py-2 text-gray-700">
-                  Logged in as:{" "}
+                  {getTitle("LOGGED_IN_AS")}
                   <span className="font-semibold">{currentUsername}</span>
                 </p>
                 <button
                   onClick={handleLogout}
                   className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
                 >
-                  Logout
+                  {getTitle("LOGOUT")}
                 </button>
               </div>
             )}
@@ -330,7 +327,7 @@ const ProjectTasks = () => {
           onClick={() => handleAnalyticsClick(projectid)}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition"
         >
-          Show Analytics
+          {getTitle("SHOW_ANALYTICS")}
         </button>
       </div>
 

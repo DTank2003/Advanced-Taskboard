@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../redux/actions/authActions";
 import { fetchNotifications } from "../redux/actions/notificationActions";
 import { loginSchema } from "../utils/validationSchemas";
+import { getTitle } from "../constants/constants";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -61,7 +62,7 @@ const Login = () => {
     >
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md bg-opacity-90">
         <h2 className="text-2xl font-bold text-center text-blue-500 mb-6">
-          LOGIN
+          {getTitle("LOGIN")}
         </h2>
         <form>
           <InputField
@@ -85,9 +86,9 @@ const Login = () => {
           <p className="text-red-500 text-center mt-4">{loginError}</p>
         )}
         <p className="text-center text-gray-600 mt-4">
-          Donot have an account?{" "}
+          {getTitle("NO_ACCOUNT")}
           <Link to="/signup" className="text-blue-500 hover:underline">
-            Signup
+            {getTitle("SIGNUP")}
           </Link>
         </p>
       </div>

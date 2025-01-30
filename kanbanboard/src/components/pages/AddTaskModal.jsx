@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
+import { getTitle } from "../../constants/constants";
 
 const AddTaskModal = ({
   showAddTaskModal,
@@ -38,7 +39,7 @@ const AddTaskModal = ({
           darkMode ? "bg-gray-900 text-white" : "bg-white"
         }`}
       >
-        <h2 className="text-lg font-semibold mb-4">Add Task</h2>
+        <h2 className="text-lg font-semibold mb-4">{getTitle("ADD_TASK")}</h2>
         <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
           <div className="mb-4">
             <label
@@ -46,7 +47,7 @@ const AddTaskModal = ({
                 darkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
-              Title
+              {getTitle("TITLE")}
             </label>
             <input
               type="text"
@@ -65,7 +66,7 @@ const AddTaskModal = ({
                 darkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
-              Description
+              {getTitle("DESCRIPTION")}
             </label>
             <textarea
               {...register("description", { required: true })}
@@ -83,7 +84,7 @@ const AddTaskModal = ({
                 darkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
-              Priority
+              {getTitle("PRIORITY")}
             </label>
             <select
               {...register("priority", { required: true })}
@@ -94,9 +95,9 @@ const AddTaskModal = ({
               }`}
               required
             >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
+              <option value="low">{getTitle("LOW")}</option>
+              <option value="medium">{getTitle("MEDIUM")}</option>
+              <option value="high">{getTitle("HIGH")}</option>
             </select>
           </div>
           <div className="mb-4">
@@ -105,7 +106,7 @@ const AddTaskModal = ({
                 darkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
-              Assigned To
+              {getTitle("ASSIGNED_TO")}
             </label>
             <select
               {...register("assignedTo", { required: true })}
@@ -116,7 +117,7 @@ const AddTaskModal = ({
               }`}
               required
             >
-              <option value="">Select User</option>
+              <option value="">{getTitle("SELECT_USER")}</option>
               {filteredUsers.map((user) => (
                 <option key={user._id} value={user._id}>
                   {user.username}
@@ -130,8 +131,10 @@ const AddTaskModal = ({
                 darkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
-              Dependencies{" "}
-              <span className="text-sm text-gray-500">(Optional)</span>
+              {getTitle("DEPENDENCIES")}
+              <span className="text-sm text-gray-500">
+                {getTitle("OPTIONAL")}
+              </span>
             </label>
             <select
               multiple
@@ -149,7 +152,7 @@ const AddTaskModal = ({
                   </option>
                 ))
               ) : (
-                <option disabled>No tasks available</option>
+                <option disabled>{getTitle("NO_TASK_AVAILABLE")}</option>
               )}
             </select>
           </div>
@@ -159,7 +162,7 @@ const AddTaskModal = ({
                 darkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
-              Attachment
+              {getTitle("ATTACHMENT")}
             </label>
             <input
               name="attachment"
@@ -181,7 +184,7 @@ const AddTaskModal = ({
                 darkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
-              Due Date
+              {getTitle("DUE_DATE")}
             </label>
             <input
               type="date"
@@ -200,13 +203,13 @@ const AddTaskModal = ({
               onClick={() => setShowAddTaskModal(false)}
               className="bg-gray-500 text-white rounded py-2 px-4 mr-2"
             >
-              Cancel
+              {getTitle("CANCEL")}
             </button>
             <button
               type="submit"
               className="bg-blue-500 text-white rounded py-2 px-4"
             >
-              Add
+              {getTitle("ADD")}
             </button>
           </div>
         </form>

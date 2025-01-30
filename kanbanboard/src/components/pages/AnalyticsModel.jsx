@@ -9,6 +9,7 @@ import {
   CategoryScale,
   LinearScale,
 } from "chart.js";
+import { getTitle } from "../../constants/constants";
 
 ChartJS.register(
   ArcElement,
@@ -64,17 +65,17 @@ const AnalyticsModal = ({ isOpen, onClose, analyticsData, darkMode }) => {
         className={`relative p-6 rounded-md ${modalBackgroundClass} w-full max-w-4xl mx-4 max-h-lvh overflow-y-auto`}
       >
         <h2 className={`text-lg font-semibold mb-4 ${textClass}`}>
-          Project Analytics
+          {getTitle("PROJECT_ANALYTICS")}
         </h2>
         <button
           onClick={onClose}
           className={`absolute top-4 right-4 ${buttonClass} text-white rounded-full px-4 py-2`}
         >
-          Close
+          {getTitle("CLOSE")}
         </button>
         <div className="mb-4">
           <h3 className={`text-md font-medium mb-2 ${textClass}`}>
-            Completion Percentage
+            {getTitle("COMPLETION_PERCENTAGE")}
           </h3>
           <p className={`text-2xl font-bold ${textClass}`}>
             {completionPercentage}%
@@ -82,7 +83,7 @@ const AnalyticsModal = ({ isOpen, onClose, analyticsData, darkMode }) => {
         </div>
         <div className="mb-4">
           <h3 className={`text-md font-medium mb-2 ${textClass}`}>
-            Tasks by Status
+            {getTitle("TASKS_BY_STATUS")}
           </h3>
           <div className="w-full h-64">
             <Bar
@@ -93,7 +94,7 @@ const AnalyticsModal = ({ isOpen, onClose, analyticsData, darkMode }) => {
         </div>
         <div className="mb-4">
           <h3 className={`text-md font-medium mb-2 ${textClass}`}>
-            Tasks by Priority
+            {getTitle("TASKS_BY_PRIORITY")}
           </h3>
           <div className="w-full h-64">
             <Doughnut

@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
 import { fetchUsers } from "../../redux/actions/userActions";
+import { getTitle } from "../../constants/constants";
 
 const EditProjectModal = ({ onClose, onEditProject, project, isDarkMode }) => {
   const { users } = useSelector((state) => state.users);
@@ -52,10 +53,12 @@ const EditProjectModal = ({ onClose, onEditProject, project, isDarkMode }) => {
           isDarkMode ? "bg-gray-900 text-white" : "bg-white text-black"
         } p-6 rounded-md w-1/2`}
       >
-        <h2 className="text-lg font-semibold mb-4">Edit Project</h2>
+        <h2 className="text-lg font-semibold mb-4">
+          {getTitle("EDIT_PROJECT")}
+        </h2>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
-            <label className="block font-medium mb-2">Name</label>
+            <label className="block font-medium mb-2">{getTitle("NAME")}</label>
             <input
               type="text"
               {...register("name", { required: true })}
@@ -68,7 +71,9 @@ const EditProjectModal = ({ onClose, onEditProject, project, isDarkMode }) => {
             />
           </div>
           <div className="mb-4">
-            <label className="block font-medium mb-2">Description</label>
+            <label className="block font-medium mb-2">
+              {getTitle("DESCRIPTION")}
+            </label>
             <textarea
               {...register("description", { required: true })}
               className={`border ${
@@ -80,7 +85,9 @@ const EditProjectModal = ({ onClose, onEditProject, project, isDarkMode }) => {
             />
           </div>
           <div className="mb-4">
-            <label className="block font-medium mb-2">Assigned Manager</label>
+            <label className="block font-medium mb-2">
+              {getTitle("ASSIGNED_MANAGER")}
+            </label>
             <select
               {...register("assignedManager", { required: true })}
               className={`border ${
@@ -90,7 +97,7 @@ const EditProjectModal = ({ onClose, onEditProject, project, isDarkMode }) => {
               } rounded p-2 w-full`}
               required
             >
-              <option value="">Select Manager</option>
+              <option value="">{getTitle("SELECT_MANAGER")}</option>
               {managerUsers.map((user) => (
                 <option key={user._id} value={user._id}>
                   {user.username}
@@ -99,7 +106,9 @@ const EditProjectModal = ({ onClose, onEditProject, project, isDarkMode }) => {
             </select>
           </div>
           <div className="mb-4">
-            <label className="block font-medium mb-2">Due Date</label>
+            <label className="block font-medium mb-2">
+              {getTitle("DUE_DATE")}
+            </label>
             <input
               type="date"
               {...register("dueDate", { required: true })}
@@ -117,13 +126,13 @@ const EditProjectModal = ({ onClose, onEditProject, project, isDarkMode }) => {
               onClick={onClose}
               className="bg-gray-500 text-white rounded py-2 px-4 mr-2"
             >
-              Cancel
+              {getTitle("CANCEL")}
             </button>
             <button
               type="submit"
               className="bg-blue-500 text-white rounded py-2 px-4"
             >
-              Save
+              {getTitle("SAVE")}
             </button>
           </div>
         </form>

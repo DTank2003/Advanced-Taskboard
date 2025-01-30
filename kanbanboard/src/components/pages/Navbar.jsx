@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 import { FaBell, FaMoon, FaSun, FaUser } from "react-icons/fa";
 import NotificationDropdown from "./NotificationDropdown";
 import { useSelector } from "react-redux";
+import { getTitle } from "../../constants/constants";
 
 const Navbar = ({
   darkMode,
@@ -25,7 +26,9 @@ const Navbar = ({
         darkMode ? "bg-gray-800" : "bg-blue-600"
       }`}
     >
-      <h1 className="text-2xl font-bold tracking-wide">Manager Dashboard</h1>
+      <h1 className="text-2xl font-bold tracking-wide">
+        {getTitle("MANAGER_DASHBOARD")}
+      </h1>
       <div className="flex space-x-4 items-center">
         <input
           type="text"
@@ -47,16 +50,16 @@ const Navbar = ({
               : "border-gray-300 text-black"
           }`}
         >
-          <option value="">All</option>
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
+          <option value="">{getTitle("ALL")}</option>
+          <option value="low">{getTitle("LOW")}</option>
+          <option value="medium">{getTitle("MEDIUM")}</option>
+          <option value="high">{getTitle("HIGH")}</option>
         </select>
         <button
           onClick={handleAddTaskClick}
           className="bg-white text-blue-600 px-4 py-2 rounded-lg shadow hover:bg-gray-200 transition duration-300 ease-in-out transform hover:scale-105"
         >
-          Add Task
+          {getTitle("ADD_TASK")}
         </button>
 
         {/* Notification Icon */}
@@ -86,7 +89,7 @@ const Navbar = ({
           {isUserDropdownOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-10">
               <p className="px-4 py-2 text-gray-700">
-                Logged in as:{" "}
+                {getTitle("LOGGED_IN_AS")}
                 <span className="font-semibold">{currentUsername}</span>
               </p>
               <hr className="border-t border-gray-300 my-2" />
@@ -94,7 +97,7 @@ const Navbar = ({
                 onClick={handleLogout}
                 className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
               >
-                Logout
+                {getTitle("LOGOUT")}
               </button>
             </div>
           )}
