@@ -179,8 +179,8 @@ const reorderTasks = async (req, res) => {
       await notifyTaskUpdate(updatedTask, `Task updated by ${user.username}`);
     }
 
-    res.status(200).json(tasks);
-    //res.status(200).json({message: 'Tasks reordered successfully'});
+    const updatedTasks = await Task.find({projectId: updatedTask.projectId});
+    res.status(200).json(updatedTasks);
   } catch(error) {
     res.status(500).json({error: "Error reordering tasks"});
   }

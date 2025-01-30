@@ -113,7 +113,7 @@ export const reorderTasks = createAsyncThunk(
   async ({ updatedTask, tasks, status }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("authToken");
-      await axiosInstance.put(
+      const {data} = await axiosInstance.put(
         "/tasks/reorder",
         { updatedTask, tasks, status },
         {
@@ -122,9 +122,7 @@ export const reorderTasks = createAsyncThunk(
           },
         }
       );
-      const taskks = tasks;
-      //await dispatchEvent(fetchTasksForUser());
-      return { updatedTask, taskks, status };
+      return data;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }

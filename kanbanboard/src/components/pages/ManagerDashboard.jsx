@@ -261,13 +261,13 @@ const ManagerDashboard = () => {
         handleLogout={handleLogout}
       />
 
-      {/* Loading and Error Messages */}
+      {/* Loading and Error Messages
       {loading && <p>{getTitle("LOADING")}</p>}
       {error && (
         <p className="text-red-500">
           {getTitle("ERROR")} {error}
         </p>
-      )}
+      )} */}
 
       {/* Add Task Modal */}
       <AddTaskModal
