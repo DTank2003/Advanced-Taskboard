@@ -8,11 +8,13 @@ const {
     deleteProject,
     getProjectsByAdmin,
     getProjectAnalytics,
+    getManagersWithNoProjects,
     getProjectsByManager
 } = require('../controllers/projectController');
 const authMiddleware = require('../middlewares/authMiddleware');
 
 router.get('/manager', authMiddleware(['manager']), getProjectsByManager);
+router.get('/managers/no-projects', authMiddleware(['admin']), getManagersWithNoProjects);
 router.get('/', authMiddleware(['admin']), getProjectsByAdmin);
 router.get('/analytics/:projectId', authMiddleware(['admin']), getProjectAnalytics);
 router.get('/:id', authMiddleware(['admin','user']), getProjectById);

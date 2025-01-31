@@ -1,5 +1,6 @@
 const Project = require('../models/projectModel');
 const Task = require('../models/taskModel');
+const User = require('../models/userModel'); // Assuming you have a User model
 
 const getAllProjects = async (req, res) => {
     try {
@@ -67,6 +68,24 @@ const getProjectsByManager = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+const getManagersWithNoProjects = async (req, res) => {
+    console.log("i was called");
+    try {
+        const projects = await Project.find().select('assignedManager');
+        //console.log(projects);
+        const assignedManagers = projects.map(project => project.assignedManager);
+        console.log(assignedManagers);
+        const managersWithNoProjects = await User.find({
+            _id: { $nin: assignedManagers },
+            role: 'manager' // Assuming you have a role field to identify managers
+        });
+        console.log(managersWithNoProjects);
+        res.status(200).json(managersWithNoProjects);
+    } catch(error) {
+        res.status(500).json({message: error.message});
+    }
+}
 
 const getProjectById = async (req, res) => {
     try {
@@ -139,6 +158,7 @@ const addTeamMember = async (req, res) => {
 module.exports = {
     getAllProjects,
     getProjectById,
+    getManagersWithNoProjects,
     createProject,
     updateProject,
     getProjectsByManager,

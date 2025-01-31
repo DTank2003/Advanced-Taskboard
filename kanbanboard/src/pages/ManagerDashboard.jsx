@@ -267,7 +267,27 @@ const ManagerDashboard = () => {
           {getTitle("ERROR")} {error}
         </p>
       )} */}
-
+      {managerProject ? (
+        <TasksList
+          columns={columns}
+          onDragEnd={onDragEnd}
+          darkMode={darkMode}
+          showLogModal={showLogModal}
+          setShowLogModal={setShowLogModal}
+          setShowCommentModal={setShowCommentModal}
+          filteredTasks={filteredTasks}
+          dependencyOptions={dependencyOptions}
+          handleEditTaskClick={handleEditTaskClick}
+          showCommentModal={showCommentModal}
+          getPriorityColor={getPriorityColor}
+          handleDeleteTask={handleDeleteTask}
+          isDueDatePassed={isDueDatePassed}
+        />
+      ) : (
+        <div className="text-center mt-10">
+          <p className="text-xl font-bold">NO PROJECT ASSIGNED</p>
+        </div>
+      )}
       {/* Add Task Modal */}
       <AddTaskModal
         showAddTaskModal={showAddTaskModal}
@@ -293,23 +313,6 @@ const ManagerDashboard = () => {
         editTask={editTask}
         register={register}
         setValue={setValue}
-      />
-
-      {/* Task List */}
-      <TasksList
-        columns={columns}
-        onDragEnd={onDragEnd}
-        darkMode={darkMode}
-        showLogModal={showLogModal}
-        setShowLogModal={setShowLogModal}
-        setShowCommentModal={setShowCommentModal}
-        filteredTasks={filteredTasks}
-        dependencyOptions={dependencyOptions}
-        handleEditTaskClick={handleEditTaskClick}
-        showCommentModal={showCommentModal}
-        getPriorityColor={getPriorityColor}
-        handleDeleteTask={handleDeleteTask}
-        isDueDatePassed={isDueDatePassed}
       />
     </div>
   );

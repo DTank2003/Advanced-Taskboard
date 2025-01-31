@@ -1,31 +1,23 @@
 import PropTypes from "prop-types"; // Import PropTypes
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 import { addProject } from "../redux/actions/projectActions";
-import { fetchUsers } from "../redux/actions/userActions";
-import { useEffect } from "react";
+import { fetchManagersWithNoProjects } from "../redux/actions/userActions";
 import { getTitle } from "../constants/constants";
 
-const AddProjectModal = ({ onClose, isDarkMode }) => {
+const AddProjectModal = ({ managersWithNoProject, onClose, isDarkMode }) => {
   const dispatch = useDispatch();
-  const { users, loading, error } = useSelector((state) => state.users);
   const { register, handleSubmit, reset } = useForm();
 
-  useEffect(() => {
-    dispatch(fetchUsers());
-  }, [dispatch]);
-
   const onSubmit = (data) => {
+    console.log(data);
     dispatch(addProject(data));
+    dispatch(fetchManagersWithNoProjects());
     reset();
     onClose();
   };
 
-  // Filter users to show only managers
-  const managerUsers = Array.isArray(users)
-    ? users.filter((user) => user.role === "manager")
-    : [];
-
+  const managerUsers = managersWithNoProject ? managersWithNoProject : [];
   return (
     <div
       className={`fixed inset-0 ${
@@ -71,7 +63,7 @@ const AddProjectModal = ({ onClose, isDarkMode }) => {
           <div className="mb-4">
             <label className="block mb-2">{getTitle("ASSIGNED_MANAGER")}</label>
             <select
-              {...register("managerId", { required: true })}
+              {...register("assignedManager", { required: true })}
               className={`w-full p-2 border rounded ${
                 isDarkMode ? "bg-gray-600 text-white" : "bg-gray-200 text-black"
               }`}
@@ -101,19 +93,16 @@ const AddProjectModal = ({ onClose, isDarkMode }) => {
                   ? "bg-blue-600 text-white hover:bg-blue-700"
                   : "bg-blue-500 text-white hover:bg-blue-600"
               }`}
-              disabled={loading}
-            >
-              {loading ? "Adding..." : "Add Project"}
-            </button>
+            ></button>
           </div>
         </form>
-        {error && <p className="text-red-500 mt-4">{error}</p>}
       </div>
     </div>
   );
 };
 
 AddProjectModal.propTypes = {
+  managersWithNoProject: PropTypes.array.isRequired,
   isDarkMode: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
 };

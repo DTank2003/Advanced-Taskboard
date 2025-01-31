@@ -8,16 +8,20 @@ import {
   addProject,
   deleteProject,
   editProject,
+  fetchManagerProject,
   fetchProjects,
 } from "../redux/actions/projectActions";
-import { fetchUsers } from "../redux/actions/userActions";
+import {
+  fetchManagersWithNoProjects,
+  fetchUsers,
+} from "../redux/actions/userActions";
 import { getTitle } from "../constants/constants";
 
 const AdminDashboard = () => {
   //const [projects, setProjects] = useState([]);
   // const [users, setUsers] = useState([]);
   const { projects, loading, error } = useSelector((state) => state.projects);
-
+  const { managersWithNoProject } = useSelector((state) => state.users);
   const [edittProject, setEdittProject] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -33,6 +37,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     dispatch(fetchProjects());
+    dispatch(fetchManagersWithNoProjects());
   }, [dispatch]);
 
   const handleAddProject = async (projectData) => {
@@ -85,7 +90,7 @@ const AdminDashboard = () => {
         <div className="flex space-x-4">
           <button
             onClick={() => {
-              dispatch(fetchUsers());
+              dispatch(fetchManagersWithNoProjects());
               setShowAddModal(true);
             }}
             className={`px-4 py-2 rounded-lg shadow transition ${
@@ -182,6 +187,7 @@ const AdminDashboard = () => {
       {showAddModal && (
         <AddProjectModal
           isDarkMode={darkMode}
+          managersWithNoProject={managersWithNoProject}
           onClose={() => setShowAddModal(false)}
           onAddProject={handleAddProject}
         />

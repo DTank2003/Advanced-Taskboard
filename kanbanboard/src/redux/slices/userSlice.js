@@ -1,10 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {fetchUsername, fetchUsers} from "../actions/userActions";
+import {fetchManagersWithNoProjects, fetchUsername, fetchUsers} from "../actions/userActions";
 
 const userSlice = createSlice({
     name: "users",
     initialState: {
         users: [],
+        managersWithNoProject: null,
         currentUsername: "",
         loading: false,
         error: null,
@@ -33,6 +34,19 @@ const userSlice = createSlice({
                 state.loading = false;
             })
             .addCase(fetchUsername.rejected, (state, action) => {
+                state.error = action.payload;
+                state.loading = false;
+            })
+            .addCase(fetchManagersWithNoProjects.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchManagersWithNoProjects.fulfilled, (state, action) => {
+                console.log(action.payload);
+                state.managersWithNoProject = action.payload;
+                state.loading = false;
+            })
+            .addCase(fetchManagersWithNoProjects.rejected, (state, action) => {
                 state.error = action.payload;
                 state.loading = false;
             });

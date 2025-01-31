@@ -2,16 +2,19 @@ import PropTypes from "prop-types";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
-import { fetchUsers } from "../redux/actions/userActions";
+import {
+  fetchManagersWithNoProjects,
+  fetchUsers,
+} from "../redux/actions/userActions";
 import { getTitle } from "../constants/constants";
 
 const EditProjectModal = ({ onClose, onEditProject, project, isDarkMode }) => {
-  const { users } = useSelector((state) => state.users);
+  const { users, managersWithNoProject } = useSelector((state) => state.users);
   const { register, handleSubmit, reset, setValue } = useForm();
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchUsers());
+    dispatch(fetchManagersWithNoProjects());
   }, [dispatch]);
 
   useEffect(() => {
@@ -38,9 +41,7 @@ const EditProjectModal = ({ onClose, onEditProject, project, isDarkMode }) => {
   };
 
   // Filter users to show only managers
-  const managerUsers = Array.isArray(users)
-    ? users.filter((user) => user.role === "manager")
-    : [];
+  const managerUsers = managersWithNoProject ? managersWithNoProject : [];
 
   return (
     <div
