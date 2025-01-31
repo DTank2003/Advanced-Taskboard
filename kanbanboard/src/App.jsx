@@ -1,10 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
-import AdminDashboard from "./components/pages/AdminDashboard";
-import UserDashboard from "./components/pages/UserDashboard";
-import ManagerDashboard from "./components/pages/ManagerDashboard";
-import ProjectTasks from "./components/pages/ProjectTasks";
+import AdminDashboard from "./pages/AdminDashboard";
+import UserDashboard from "./pages/UserDashboard";
+import ManagerDashboard from "./pages/ManagerDashboard";
+import ProjectTasks from "./pages/ProjectTasks";
 import AuthGuard from "./components/AuthGuard";
 
 const App = () => {
