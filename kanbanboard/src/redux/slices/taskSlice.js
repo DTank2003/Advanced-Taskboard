@@ -83,6 +83,7 @@ const taskSlice = createSlice({
       .addCase(reorderTasks.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.tasks = null;
       })
       .addCase(reorderTasks.fulfilled, (state, action) => {
         state.loading = false;

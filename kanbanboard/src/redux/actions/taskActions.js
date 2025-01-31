@@ -1,4 +1,4 @@
-import { createAction, createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../utils/axiosInstance";
 
 export const fetchTasks = createAsyncThunk(
@@ -105,8 +105,6 @@ export const deleteTask = createAsyncThunk(
     }
   }
 );
-
-export const setTasks = createAction("tasks/setTasks");
 
 export const reorderTasks = createAsyncThunk(
   "tasks/reorderTasks",
