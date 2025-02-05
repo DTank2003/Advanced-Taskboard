@@ -1,4 +1,4 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
+import { createAction, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../utils/axiosInstance";
 
 export const fetchUsers = createAsyncThunk(
@@ -60,3 +60,6 @@ export const fetchUsername = createAsyncThunk(
     }
   }
 );
+
+// Action to update user list when a new message is received
+export const updateUserList = createAction("users/updateUserList");

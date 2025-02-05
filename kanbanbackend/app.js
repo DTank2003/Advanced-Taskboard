@@ -25,6 +25,7 @@ const io = new Server(server, {
     methods: ['GET', 'POST'],
   },
 });
+
 app.use((req, res,next) => {
   req.io = io;
   next();

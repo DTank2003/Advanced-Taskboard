@@ -63,5 +63,7 @@ const labels = {
     MANAGER: "Manager",
     SIGNUP_SUCCESS: "Signup successful! Redirecting...",
     HAVE_ACCOUNT: "Already have an account?",
-     
+    FETCH_COLUMNS: "FETCH_COLUMNS",
+    ADD_COLUMN: "ADD_COLUMN",
+
 }

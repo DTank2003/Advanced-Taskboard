@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {fetchManagersWithNoProjects, fetchUsername, fetchUsers} from "../actions/userActions";
+import {fetchManagersWithNoProjects, fetchUsername, fetchUsers, updateUserList} from "../actions/userActions";
 
 const userSlice = createSlice({
     name: "users",
@@ -51,7 +51,19 @@ const userSlice = createSlice({
             .addCase(fetchManagersWithNoProjects.rejected, (state, action) => {
                 state.error = action.payload;
                 state.loading = false;
-            });
+            })
+            .addCase(updateUserList, (state, action) => {
+                const { userId, latestMessage } = action.payload;
+                const existingUser = state.users.find((user) => user._id === userId);
+        
+                if (existingUser) {
+                  // Move user to top and update the latest message
+                  state.users = [
+                    { ...existingUser, latestMessage, hasNewMessage: true },
+                    ...state.users.filter((user) => user._id !== userId),
+                  ];
+                }
+              }); 
     },
 })
 

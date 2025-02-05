@@ -15,6 +15,7 @@ const ChatPage = () => {
   const [text, setText] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [darkMode, setDarkMode] = useState(true);
+  const [newMessages, setNewMessages] = useState({});
   const messagesEndRef = useRef(null);
   const dispatch = useDispatch();
   const { users } = useSelector((state) => state.users);
@@ -24,17 +25,29 @@ const ChatPage = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    socket = io("http://localhost:3005", { autoConnect: true });
+    socket = io("http://192.168.24.24:3005", { autoConnect: true });
 
     // Listen for new messages on the frontend
     socket.on(`new_message_${userId}`, (message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
+      if (
+        (message.senderId === selectedUser?._id &&
+          message.receiverId === userId) ||
+        (message.senderId === userId &&
+          message.receiverId === selectedUser?._id)
+      ) {
+        setMessages((prevMessages) => [...prevMessages, message]);
+      } else if (message.receiverId === userId) {
+        setNewMessages((prevNewMessages) => ({
+          ...prevNewMessages,
+          [message.senderId]: true,
+        }));
+      }
     });
 
     return () => {
       socket.disconnect();
     };
-  }, [userId]);
+  }, [userId, selectedUser]);
 
   useEffect(() => {
     if (!selectedUser) return;
@@ -43,13 +56,21 @@ const ChatPage = () => {
       .get(`/chat/${userId}/${selectedUser._id}`)
       .then((res) => setMessages(res.data))
       .catch((err) => console.error("Error fetching messages:", err));
+
+    // Remove new message highlight for the selected user
+    setNewMessages((prevNewMessages) => {
+      const { [selectedUser._id]: _, ...rest } = prevNewMessages;
+      return rest;
+    });
   }, [selectedUser]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const sendMessage = async () => {
+  const sendMessage = async (e) => {
+    if (e) e.preventDefault(); // Prevent default form submission
+
     if (text.trim() !== "" && selectedUser) {
       const messageData = {
         senderId: userId,
@@ -64,13 +85,25 @@ const ChatPage = () => {
         const message = response.data;
 
         // Update state with the sent message
-        setMessages((prevMessages) => [...prevMessages, message]);
+        //setMessages((prevMessages) => [...prevMessages, message]);
         setText(""); // Clear the message input
+
+        // Remove new message highlight for the selected user
+        setNewMessages((prevNewMessages) => {
+          const { [selectedUser._id]: _, ...rest } = prevNewMessages;
+          return rest;
+        });
       } catch (error) {
         console.error("Error sending message:", error);
       }
     }
   };
+
+  const sortedUsers = [...users].sort((a, b) => {
+    if (newMessages[a._id] && !newMessages[b._id]) return -1;
+    if (!newMessages[a._id] && newMessages[b._id]) return 1;
+    return 0;
+  });
 
   return (
     <div
@@ -98,7 +131,7 @@ const ChatPage = () => {
           />
         </div>
         <div className="mt-4 overflow-y-auto h-[80vh]">
-          {users
+          {sortedUsers
             .filter((user) =>
               user.username.toLowerCase().includes(searchTerm.toLowerCase())
             )
@@ -112,7 +145,7 @@ const ChatPage = () => {
                     : darkMode
                     ? "hover:bg-gray-700"
                     : "hover:bg-gray-300"
-                }`}
+                } ${newMessages[user._id] ? "bg-yellow-300" : ""}`}
               >
                 {user.username}
               </div>
@@ -181,10 +214,11 @@ const ChatPage = () => {
 
         {/* Message Input */}
         {selectedUser && (
-          <div
+          <form
             className={`p-4 flex items-center ${
               darkMode ? "bg-gray-800" : "bg-gray-200"
             }`}
+            onSubmit={sendMessage}
           >
             <input
               type="text"
@@ -196,12 +230,12 @@ const ChatPage = () => {
               } rounded-lg focus:outline-none`}
             />
             <button
-              onClick={sendMessage}
+              type="submit"
               className="ml-3 p-3 bg-blue-600 rounded-full text-white hover:bg-blue-700"
             >
               <FaPaperPlane />
             </button>
-          </div>
+          </form>
         )}
       </div>
     </div>

@@ -33,7 +33,7 @@ const getChatHistory = async (req, res) => {
         { senderId: otherUserId, receiverId: userId },
       ],
     }).sort('timestamp');
-
+    console.log(messages);
     res.json(messages);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch messages' });
