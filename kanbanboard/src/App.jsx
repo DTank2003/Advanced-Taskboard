@@ -6,6 +6,7 @@ import UserDashboard from "./pages/UserDashboard";
 import ManagerDashboard from "./pages/ManagerDashboard";
 import ProjectTasks from "./pages/ProjectTasks";
 import AuthGuard from "./components/AuthGuard";
+import ChatPage from "./pages/ChatPage";
 
 const App = () => {
   return (
@@ -42,6 +43,14 @@ const App = () => {
           element={
             <AuthGuard>
               <UserDashboard />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/chat/:userId"
+          element={
+            <AuthGuard>
+              <ChatPage />
             </AuthGuard>
           }
         />

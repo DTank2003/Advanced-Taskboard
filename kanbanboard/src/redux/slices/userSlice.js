@@ -7,6 +7,7 @@ const userSlice = createSlice({
         users: [],
         managersWithNoProject: null,
         currentUsername: "",
+        currentUserId: "",
         loading: false,
         error: null,
     },
@@ -30,7 +31,8 @@ const userSlice = createSlice({
                 state.error = null;
             })
             .addCase(fetchUsername.fulfilled, (state, action) => {
-                state.currentUsername = action.payload;
+                state.currentUsername = action.payload.username;
+                state.currentUserId = action.payload._id;
                 state.loading = false;
             })
             .addCase(fetchUsername.rejected, (state, action) => {

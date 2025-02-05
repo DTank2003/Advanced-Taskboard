@@ -1,8 +1,9 @@
 import PropTypes from "prop-types";
-import { FaBell, FaMoon, FaSun, FaUser } from "react-icons/fa";
+import { FaBell, FaMoon, FaSun, FaUser, FaComments } from "react-icons/fa";
 import NotificationDropdown from "./NotificationDropdown";
 import { useSelector } from "react-redux";
 import { getTitle } from "../constants/constants";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = ({
   darkMode,
@@ -18,7 +19,14 @@ const Navbar = ({
   handleAddTaskClick,
   handleLogout,
 }) => {
-  const { currentUsername } = useSelector((state) => state.users);
+  const { currentUsername, currentUserId } = useSelector(
+    (state) => state.users
+  );
+  const navigate = useNavigate();
+
+  const handleChatRedirect = () => {
+    navigate(`/chat/${currentUserId}`);
+  };
 
   return (
     <nav
@@ -30,6 +38,12 @@ const Navbar = ({
         {getTitle("MANAGER_DASHBOARD")}
       </h1>
       <div className="flex space-x-4 items-center">
+        <button
+          onClick={handleChatRedirect}
+          className="px-4 py-2 rounded-lg bg-purple-600 text-white shadow hover:bg-purple-700 flex items-center"
+        >
+          <FaComments className="mr-2" /> Chats
+        </button>
         <input
           type="text"
           placeholder="Search tasks..."

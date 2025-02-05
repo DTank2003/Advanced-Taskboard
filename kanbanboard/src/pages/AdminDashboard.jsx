@@ -2,17 +2,17 @@ import { useState, useEffect } from "react";
 import AddProjectModal from "./AddProjectModal";
 import EditProjectModal from "./EditProjectModal";
 import { useNavigate } from "react-router-dom";
-import { FaEdit, FaTrash, FaSun, FaMoon } from "react-icons/fa";
+import { FaEdit, FaTrash, FaSun, FaMoon, FaComments } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addProject,
   deleteProject,
   editProject,
-  fetchManagerProject,
   fetchProjects,
 } from "../redux/actions/projectActions";
 import {
   fetchManagersWithNoProjects,
+  fetchUsername,
   fetchUsers,
 } from "../redux/actions/userActions";
 import { getTitle } from "../constants/constants";
@@ -26,6 +26,7 @@ const AdminDashboard = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
+  const { currentUserId } = useSelector((state) => state.users);
 
   if (!localStorage.getItem("authToken")) {
     console.error("User is not authenticated.");
@@ -35,9 +36,14 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const handleChatRedirect = () => {
+    navigate(`/chat/${currentUserId}`);
+  };
+
   useEffect(() => {
     dispatch(fetchProjects());
     dispatch(fetchManagersWithNoProjects());
+    dispatch(fetchUsername());
   }, [dispatch]);
 
   const handleAddProject = async (projectData) => {
@@ -88,6 +94,12 @@ const AdminDashboard = () => {
       >
         <h1 className="text-xl font-bold">{getTitle("ADMIN_DASHBOARD")}</h1>
         <div className="flex space-x-4">
+          <button
+            onClick={handleChatRedirect}
+            className="px-4 py-2 rounded-lg bg-purple-600 text-white shadow hover:bg-purple-700 flex items-center"
+          >
+            <FaComments className="mr-2" /> Chats
+          </button>
           <button
             onClick={() => {
               dispatch(fetchManagersWithNoProjects());

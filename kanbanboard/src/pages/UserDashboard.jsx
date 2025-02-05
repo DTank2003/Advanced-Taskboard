@@ -8,6 +8,7 @@ import {
   FaBell,
   FaMoon,
   FaSun,
+  FaComments,
 } from "react-icons/fa";
 import AddCommentModal from "./AddCommentModal";
 import ActivityLogModal from "./ActivityLogModal";
@@ -22,7 +23,9 @@ const UserDashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { tasks } = useSelector((state) => state.tasks);
-  const { currentUsername } = useSelector((state) => state.users);
+  const { currentUsername, currentUserId } = useSelector(
+    (state) => state.users
+  );
   const [showLogModal, setShowLogModal] = useState(false);
   const [dependencyOptions, setDependencyOptions] = useState([]);
   const [columns, setColumns] = useState({
@@ -199,6 +202,10 @@ const UserDashboard = () => {
     navigate("/");
   };
 
+  const handleChatRedirect = () => {
+    navigate(`/chat/${currentUserId}`);
+  };
+
   return (
     <div
       className={`min-h-screen ${
@@ -214,6 +221,12 @@ const UserDashboard = () => {
           {getTitle("USER_DASHBOARD")}
         </h1>
         <div className="flex space-x-4 items-center">
+          <button
+            onClick={handleChatRedirect}
+            className="px-4 py-2 rounded-lg bg-purple-600 text-white shadow hover:bg-purple-700 flex items-center"
+          >
+            <FaComments className="mr-2" /> Chats
+          </button>
           <input
             type="text"
             placeholder="Search tasks..."

@@ -54,7 +54,7 @@ export const fetchUsername = createAsyncThunk(
           Authorization: `Bearer ${token}`,
         },
       });
-      return data.username;
+      return data;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }

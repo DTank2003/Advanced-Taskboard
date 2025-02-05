@@ -25,35 +25,18 @@ const io = new Server(server, {
     methods: ['GET', 'POST'],
   },
 });
-
+app.use((req, res,next) => {
+  req.io = io;
+  next();
+})
+// WebSocket events
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
 
-  // Listen for private chat messages
-  socket.on('send_message', async (messageData) => {
-    console.log('Message received:', messageData);
-
-    try {
-      // Save message to MongoDB
-      const message = new Message(messageData);
-      await message.save();
-
-      // Emit message to specific user
-      io.to(messageData.receiverId).emit('receive_message', messageData);
-    } catch (error) {
-      console.error('Error saving message:', error);
-    }
-  });
-
-  // Handle disconnect
+  // Handle disconnect event
   socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
+    console.log('A user disconnected');
   });
-});
-
-
-app.get('/', (req, res) => {
-  res.send('Hello World');
 });
 
 app.use('/api/auth', require('./routes/authRoutes'));

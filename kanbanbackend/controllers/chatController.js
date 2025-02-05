@@ -1,4 +1,26 @@
 const Message = require('../models/messageModel');
+// Send message and emit event to both sender and receiver
+const sendMessage = async (req, res) => {
+  try {
+    const { senderId, receiverId, text } = req.body;
+    const message = new Message({
+      senderId,
+      receiverId,
+      text,
+      timestamp: new Date(),
+    });
+    await message.save();
+    
+    // Emit to both sender and receiver
+    req.io.emit(`new_message_${senderId}`, message); // Emit to sender
+    req.io.emit(`new_message_${receiverId}`, message); // Emit to receiver
+
+    return res.status(201).json(message);
+  } catch (error) {
+    console.error('Error sending message:', error);
+    return res.status(500).json({ error: 'Failed to send message' });
+  }
+};
 
 // Get chat history between two users
 const getChatHistory = async (req, res) => {
@@ -36,4 +58,4 @@ const saveMessage = async (req, res) => {
   }
 };
 
-module.exports = { getChatHistory, saveMessage };
+module.exports = { getChatHistory, sendMessage, saveMessage };
